@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to The Piece Hall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Embedded Shared Styles */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #000000;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+        .bg-sandstone-gold { background-color: #B3A369; }
+        .text-parchment { color: #F5F5DC; }
+        .text-sandstone-gold { color: #B3A369; }
+        .border-sandstone-gold { border-color: #B3A369; }
+        .content-page-header {
+            background-color: #111111;
+            border-bottom: 1px solid #B3A369;
+        }
+        /* Helper class to hide/show pages */
+        .page-section.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-parchment">
+
+    <!-- =========== HOME HUB PAGE =========== -->
+    <main id="hub-page" class="page-section min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
+        <div class="w-full max-w-md mx-auto text-center">
+            <header class="mb-10">
+                <!-- Embedded SVG Logo -->
+                <svg class="h-20 mx-auto mb-6" viewBox="0 0 100 125" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50.003 0C22.383 0 0 22.383 0 50.003s22.383 50.003 50.003 50.003 50.003-22.383 50.003-50.003S77.623 0 50.003 0zm0 91.672c-23.008 0-41.669-18.66-41.669-41.669S26.995 8.334 50.003 8.334s41.669 18.66 41.669 41.669-18.66 41.669-41.669 41.669z" fill="#F5F5DC"/><path d="M50.003 16.667C31.583 16.667 16.667 31.583 16.667 50.003c0 18.42 14.916 33.336 33.336 33.336 18.42 0 33.336-14.916 33.336-33.336 0-18.42-14.916-33.336-33.336-33.336zm-8.334 52.78V30.557h16.668v13.89h-8.334v21.523l8.334.004v13.89h-16.668z" fill="#F5F5DC"/></svg>
+                <h1 class="text-4xl md:text-5xl font-bold text-sandstone-gold">Welcome to The Piece Hall</h1>
+                <p class="text-lg text-parchment/70 mt-2" id="current-date">Your guide for today</p>
+            </header>
+            <div class="space-y-4">
+                <button data-target="map-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                    <i data-lucide="map-pin" class="w-6 h-6 mr-4"></i><span class="flex-grow text-left">Wayfinding & Amenities</span><i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+                <button data-target="shops-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                    <i data-lucide="shopping-bag" class="w-6 h-6 mr-4"></i><span class="flex-grow text-left">Shops & Eateries</span><i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+                <button data-target="events-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                    <i data-lucide="calendar-check" class="w-6 h-6 mr-4"></i><span class="flex-grow text-left">Events & Tickets</span><i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+                <button data-target="history-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                    <i data-lucide="landmark" class="w-6 h-6 mr-4"></i><span class="flex-grow text-left">History & Heritage</span><i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <footer class="mt-12">
+                <div class="flex justify-center space-x-6">
+                    <a href="https://www.facebook.com/thepiecehallhalifax/" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Facebook"><i data-lucide="facebook" class="w-6 h-6"></i></a>
+                    <a href="https://www.instagram.com/thepiecehallhalifax/" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Instagram"><i data-lucide="instagram" class="w-6 h-6"></i></a>
+                    <a href="https://twitter.com/ThePieceHall" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Twitter/X"><i data-lucide="twitter" class="w-6 h-6"></i></a>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- =========== WAYFINDING PAGE (UPDATED) =========== -->
+    <div id="map-page" class="page-section hidden">
+        <header class="sticky top-0 z-10 w-full p-4 flex items-center justify-between content-page-header shadow-lg">
+            <button data-target="hub-page" class="page-link flex items-center transition-opacity hover:opacity-80 text-sandstone-gold"><i data-lucide="arrow-left" class="w-6 h-6 mr-2"></i><span>Back to Hub</span></button>
+            <h1 class="text-2xl font-bold text-sandstone-gold">Wayfinding & Amenities</h1>
+        </header>
+        <main class="p-4 sm:p-6">
+            <div class="max-w-md mx-auto space-y-8">
+                
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-sandstone-gold">Venue Map</h2>
+                    <div class="bg-transparent p-2 rounded-lg border border-sandstone-gold/50">
+                        <img src="https://www.thepiecehall.co.uk/wp-content/uploads/2023/05/The-Piece-Hall-Web-Map-May-23-V2.jpg" alt="Map of The Piece Hall" class="rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/600x400/000000/B3A369?text=Map+Unavailable';">
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-sandstone-gold">Key Locations</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-start"><i data-lucide="door-open" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Entrances / Exits</span><br>North, West, South & East Gates.</div></li>
+                        <li class="flex items-start"><i data-lucide="info" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Visitor Centre</span><br>Located in the South East corner. For information, tickets, and assistance.</div></li>
+                        <li class="flex items-start"><i data-lucide="baby" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Toilets & Baby Changing</span><br>Located on the Arcade (ground) level, near the South Gate.</div></li>
+                        <li class="flex items-start"><i data-lucide="wifi" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Free Wi-Fi</span><br>Connect to the 'Piece Hall Free WiFi' network.</div></li>
+                         <li class="flex items-start"><i data-lucide="first-aid" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">First Aid</span><br>Please contact any member of staff or visit the Visitor Centre for assistance.</div></li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-sandstone-gold">Accessibility</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-start"><i data-lucide="wheelchair" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Step-Free Access</span><br>Ramp and lift access is available at all main public entrances.</div></li>
+                        <li class="flex items-start"><i data-lucide="elevator" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Lift Access</span><br>A public lift provides access to all three levels (Arcade, Colonnade, Rustic).</div></li>
+                        <li class="flex items-start"><i data-lucide="dog" class="w-5 h-5 mr-4 mt-1 text-sandstone-gold/80"></i><div><span class="font-semibold">Assistance Dogs</span><br>Assistance dogs are welcome throughout the venue.</div></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- =========== SHOPS PAGE (UPDATED AND EXPANDED) =========== -->
+    <div id="shops-page" class="page-section hidden">
+        <header class="sticky top-0 z-10 w-full p-4 flex items-center justify-between content-page-header shadow-lg">
+            <button data-target="hub-page" class="page-link flex items-center transition-opacity hover:opacity-80 text-sandstone-gold"><i data-lucide="arrow-left" class="w-6 h-6 mr-2"></i><span>Back to Hub</span></button>
+            <h1 class="text-2xl font-bold text-sandstone-gold">Shops & Eateries</h1>
+        </header>
+        <main class="p-4 sm:p-6"><div class="max-w-md mx-auto space-y-6">
+            
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h3 class="text-xl font-bold text-sandstone-gold">The Book Corner</h3>
+                <p class="text-sm text-parchment/70 mb-3">Independent bookshop with a wide range of fiction, non-fiction and children's books.</p>
+                <div class="text-sm space-y-2">
+                    <p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Mon-Sat: 10am - 5pm, Sun: 10am - 4pm</p>
+                    <p class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Colonnade Level</p>
+                </div>
+            </div>
+            
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h3 class="text-xl font-bold text-sandstone-gold">The Trading Rooms</h3>
+                <p class="text-sm text-parchment/70 mb-3">Restaurant and bar with a focus on seasonal Yorkshire produce.</p>
+                <div class="text-sm space-y-2">
+                    <p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Thu: 12pm-7pm, Fri-Sat: 12pm-11pm, Sun: 11am-8pm</p>
+                    <p class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Courtyard Level</p>
+                </div>
+            </div>
+
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h3 class="text-xl font-bold text-sandstone-gold">The Deli</h3>
+                <p class="text-sm text-parchment/70 mb-3">Showcasing locally sourced food & drink, craft beer, and selected wines.</p>
+                <div class="text-sm space-y-2">
+                    <p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Mon-Sun: 9:30am - 4:30pm (Sat to 5:30pm)</p>
+                    <p class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Colonnade Level</p>
+                </div>
+            </div>
+
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h3 class="text-xl font-bold text-sandstone-gold">La Piazza</h3>
+                <p class="text-sm text-parchment/70 mb-3">Family-run café and restaurant offering authentic Italian food.</p>
+                <div class="text-sm space-y-2"><p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Opening times vary</p><p class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Arcade Level</p></div>
+            </div>
+            
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h3 class="text-xl font-bold text-sandstone-gold">Indian Summer</h3>
+                <p class="text-sm text-parchment/70 mb-3">Fashion & Accessories</p>
+                <div class="text-sm space-y-2"><p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Opening times vary</p><p class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Colonnade Level</p></div>
+            </div>
+
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h3 class="text-xl font-bold text-sandstone-gold">The Wine Barrel</h3>
+                <p class="text-sm text-parchment/70 mb-3">Bar</p>
+                <div class="text-sm space-y-2"><p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Opening times vary</p><p class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Arcade Level</p></div>
+            </div>
+
+        </div></main>
+    </div>
+
+    <!-- =========== EVENTS PAGE (UPDATED) =========== -->
+    <div id="events-page" class="page-section hidden">
+        <header class="sticky top-0 z-10 w-full p-4 flex items-center justify-between content-page-header shadow-lg">
+            <button data-target="hub-page" class="page-link flex items-center transition-opacity hover:opacity-80 text-sandstone-gold"><i data-lucide="arrow-left" class="w-6 h-6 mr-2"></i><span>Back to Hub</span></button>
+            <h1 class="text-2xl font-bold text-sandstone-gold">Events & Tickets</h1>
+        </header>
+        <main class="p-4 sm:p-6"><div class="max-w-md mx-auto space-y-8">
+            <div>
+                <h2 class="text-2xl font-bold mb-4 text-sandstone-gold">Today's Events</h2>
+                <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                    <h3 class="text-xl font-bold">Courtyard Music Sessions</h3>
+                    <p class="text-sm text-parchment/70 mb-3">Live acoustic music from local artists.</p>
+                    <div class="text-sm space-y-2"><p class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>2:00 PM - 4:00 PM</p><p class="flex items-center"><i data-lucide="ticket" class="w-4 h-4 mr-2 text-sandstone-gold/80"></i>Free to enjoy</p></div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold mb-4 text-sandstone-gold">Community & Culture</h2>
+                <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50 mb-4 space-y-3">
+                    <h3 class="text-xl font-bold">Real Markets</h3>
+                     <p class="text-sm">Artisan food, drink, and crafts from local producers.</p>
+                     <p class="text-sm font-semibold">Next Market: Sunday, 12 October</p>
+                </div>
+                 <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50 mb-4 space-y-3">
+                    <h3 class="text-xl font-bold">Christmas at The Piece Hall</h3>
+                     <p class="text-sm">Festive markets, ice rink, and family entertainment.</p>
+                     <p class="text-sm font-semibold">Starting mid-November</p>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-bold mb-4 text-sandstone-gold">Live at The Piece Hall 2026</h2>
+                <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50 mb-4 space-y-3">
+                    <h3 class="text-xl font-bold">Ethel Cain</h3>
+                    <p class="text-sm">Saturday, 20 June 2026</p>
+                </div>
+                <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50 mb-4 space-y-3">
+                    <h3 class="text-xl font-bold">David Gray</h3>
+                    <p class="text-sm">Sunday, 5 July 2026</p>
+                </div>
+                <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50 mb-4 space-y-3">
+                    <h3 class="text-xl font-bold">The K's</h3>
+                    <p class="text-sm">Saturday, 8 August 2026</p>
+                </div>
+                <a href="https://www.ticketmaster.co.uk/the-piece-hall-tickets-halifax/venue/434445" target="_blank" class="flex items-center justify-center w-full p-3 bg-sandstone-gold text-black font-semibold rounded-md shadow-md hover:bg-yellow-500 transition-colors">
+                    View All & Book Tickets
+                    <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                </a>
+            </div>
+        </div></main>
+    </div>
+
+    <!-- =========== HISTORY & HERITAGE PAGE (NEW) =========== -->
+    <div id="history-page" class="page-section hidden">
+        <header class="sticky top-0 z-10 w-full p-4 flex items-center justify-between content-page-header shadow-lg">
+            <button data-target="hub-page" class="page-link flex items-center transition-opacity hover:opacity-80 text-sandstone-gold"><i data-lucide="arrow-left" class="w-6 h-6 mr-2"></i><span>Back to Hub</span></button>
+            <h1 class="text-2xl font-bold text-sandstone-gold">History & Heritage</h1>
+        </header>
+        <main class="p-4 sm:p-6"><div class="max-w-md mx-auto space-y-8">
+            
+            <div class="bg-transparent p-4 rounded-lg border border-sandstone-gold/50">
+                <h2 class="text-2xl font-bold mb-3 text-sandstone-gold">The Colonnades</h2>
+                <p class="text-parchment/90 leading-relaxed">The stunning three-tiered, open-air galleries are the defining feature of The Piece Hall. The 315 individual rooms that line these colonnades were originally the stalls for the cloth traders. Today, they house a vibrant collection of independent shops, cafes, and creative businesses.</p>
+            </div>
+
+        </div></main>
+    </div>
+
+
+    <script>
+        // --- Navigation Logic ---
+        const pageSections = document.querySelectorAll('.page-section');
+        const pageLinks = document.querySelectorAll('.page-link');
+
+        function showPage(targetId) {
+            pageSections.forEach(section => {
+                if (section.id === targetId) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+            window.scrollTo(0, 0); // Scroll to top on page change
+        }
+
+        pageLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const targetPage = link.getAttribute('data-target');
+                showPage(targetPage);
+            });
+        });
+
+        // --- Icon and Date Logic ---
+        try {
+            lucide.createIcons();
+            const dateElement = document.getElementById('current-date');
+            if (dateElement) {
+                const today = new Date();
+                const options = { weekday: 'long', month: 'long', day: 'numeric' };
+                dateElement.textContent = `Your guide for ${today.toLocaleDateString('en-GB', options)}`;
+            }
+        } catch (error) {
+            console.error("Error initialising page scripts:", error);
+        }
+    </script>
+</body>
+</html>
+
