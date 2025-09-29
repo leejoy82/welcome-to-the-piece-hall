@@ -7,12 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- A-Frame and AR.js libraries for Web AR -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- Correct AR.js script for location-based AR -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Manifest and Theme Color -->
+    <link rel="manifest" id="manifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png">
+
     <style>
         /* Embedded Shared Styles */
         body {
@@ -43,6 +48,7 @@
             height: 100%;
             z-index: 20;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: rgba(0,0,0,0.8);
@@ -52,19 +58,24 @@
         }
         /* Custom styles for planner */
         #itinerary-result h3 {
-            font-size: 1.25rem;
+            font-size: 1.5rem; /* Larger than before */
+            font-family: 'Playfair Display', serif;
             font-weight: bold;
             color: #B3A369;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid #B3A369;
+            padding-bottom: 0.5rem;
         }
         #itinerary-result ul {
-            list-style-type: disc;
+            list-style-type: '✧ ';
             list-style-position: inside;
-            margin-left: 1rem;
+            margin-left: 0.5rem;
+            line-height: 1.7;
         }
         #itinerary-result p {
             margin-bottom: 0.75rem;
+            line-height: 1.6;
         }
         #itinerary-result strong {
             font-weight: bold;
@@ -77,10 +88,31 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
+            margin: 2rem auto;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        /* Dynamic Background Style */
+        #hub-page {
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
+        }
+        /* General page content styling */
+        .page-content {
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+        .page-content h3 {
+            font-size: 1.75rem;
+            color: #B3A369;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .page-content p {
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -88,50 +120,49 @@
 
     <!-- =========== HOME HUB PAGE =========== -->
     <main id="hub-page" class="page-section min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
-        <div class="w-full max-w-md mx-auto text-center">
+        <div class="w-full max-w-md mx-auto text-center bg-black bg-opacity-60 p-6 rounded-lg">
             <header class="mb-10">
-                <!-- Embedded SVG Logo -->
                 <svg class="h-20 mx-auto mb-6" viewBox="0 0 100 125" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50.003 0C22.383 0 0 22.383 0 50.003s22.383 50.003 50.003 50.003 50.003-22.383 50.003-50.003S77.623 0 50.003 0zm0 91.672c-23.008 0-41.669-18.66-41.669-41.669S26.995 8.334 50.003 8.334s41.669 18.66 41.669 41.669-18.66 41.669-41.669 41.669z" fill="#F5F5DC"/><path d="M50.003 16.667C31.583 16.667 16.667 31.583 16.667 50.003c0 18.42 14.916 33.336 33.336 33.336 18.42 0 33.336-14.916 33.336-33.336 0-18.42-14.916-33.336-33.336-33.336zm-8.334 52.78V30.557h16.668v13.89h-8.334v21.523l8.334.004v13.89h-16.668z" fill="#F5F5DC"/></svg>
                 <h1 class="text-4xl md:text-5xl font-bold text-sandstone-gold">Welcome to The Piece Hall</h1>
                 <p class="text-lg text-parchment/70 mt-2" id="current-date">Your guide for today</p>
             </header>
             <div class="space-y-4">
-                 <button data-target="planner-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold border-2 border-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                 <button data-target="planner-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <span class="text-2xl mr-4">✨</span>
                     <span class="flex-grow text-left">Plan My Visit</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="ar-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <button data-target="ar-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22.42 2.58a3.54 3.54 0 0 0-4-1.15L16.2 2.2a.6.6 0 0 0-.5.8l1.2 3.4a.6.6 0 0 0 .8.5l.8-.2a2.35 2.35 0 0 1 2.7 2.7l-.2.8a.6.6 0 0 0 .5.8l3.4 1.2a.6.6 0 0 0 .8-.5l.8-2.2a3.54 3.54 0 0 0-1.1-4zM10.2 6.8a.6.6 0 0 0-.8-.5l-3.4-1.2a.6.6 0 0 0-.8.5l-.8 2.2a3.54 3.54 0 0 0 1.1 4l2.2.8a.6.6 0 0 0 .8-.5l1.2-3.4a.6.6 0 0 0-.5-.8l-.8.2a2.35 2.35 0 0 1-2.7-2.7l.2-.8zM6.8 13.8a.6.6 0 0 0-.5-.8l-3.4-1.2a.6.6 0 0 0-.8.5l-.8 2.2a3.54 3.54 0 0 0 1.1 4l2.2.8a.6.6 0 0 0 .8-.5l1.2-3.4a.6.6 0 0 0-.8-.5l-.8.2a2.35 2.35 0 0 1-2.7-2.7l.2-.8zM12 9a3 3 0 1 0 3 3a3 3 0 0 0-3-3zm5.2-1.2a.6.6 0 0 0-.5.8l.2.8a2.35 2.35 0 0 1-2.7 2.7l-.8.2a.6.6 0 0 0-.5.8l1.2 3.4a.6.6 0 0 0 .8.5l2.2-.8a3.54 3.54 0 0 0 4-1.1l2.2-.8a.6.6 0 0 0 .5-.8l-1.2-3.4a.6.6 0 0 0-.8-.5z"/></svg>
                     <span class="flex-grow text-left">AR Wayfinder</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="map-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                <button data-target="map-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     <span class="flex-grow text-left">Wayfinding & Amenities</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="shops-only-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                 <button data-target="shops-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     <span class="flex-grow text-left">Shops</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                 <button data-target="eateries-only-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                 <button data-target="eateries-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M16 2a5 5 0 0 0-9 2.46L6 6h12l-1-1.54A5 5 0 0 0 16 2Z"/><path d="M6 6h12v3c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V6Z"/><path d="M6 13h12l-2 8H8l-2-8Z"/><path d="m12 6 1.4-2.5"/></svg>
                     <span class="flex-grow text-left">Eateries</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="events-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                <button data-target="events-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m16 14-4 4-2-2"/></svg>
                     <span class="flex-grow text-left">Events & Tickets</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="club-1779-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                <button data-target="club-1779-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M12 2 2.5 6.5v11L12 22l9.5-4.5v-11L12 2z"/><path d="m12 14.5-5-2.5"/><path d="M12 14.5v5.5"/><path d="m12 14.5 5-2.5"/><path d="m17 9.5-5 2.5"/><path d="m7 9.5 5 2.5"/></svg>
                     <span class="flex-grow text-left">Club 1779</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="history-page" class="page-link flex items-center w-full p-4 bg-transparent border-2 border-sandstone-gold text-sandstone-gold font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-sandstone-gold hover:text-black">
+                <button data-target="history-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M12 5v14"/><path d="M18 5v14"/><path d="M22 19H2"/><path d="M18 5a4 4 0 0 0-8 0"/><path d="M12 5a4 4 0 0 1 8 0"/><path d="M6 5v14"/></svg>
                     <span class="flex-grow text-left">History & Heritage</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
@@ -152,147 +183,404 @@
             </footer>
         </div>
     </main>
-    
-    <!-- =========== PLANNER PAGE (NEW) =========== -->
-    <div id="planner-page" class="page-section hidden">
-         <header class="sticky top-0 z-10 w-full p-4 flex items-center justify-between content-page-header shadow-lg">
-            <button data-target="hub-page" class="page-link flex items-center transition-opacity hover:opacity-80 text-sandstone-gold">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-2"><path d="m15 18-6-6 6-6"/></svg>
-                <span>Back to Hub</span>
+
+    <!-- =========== CONTENT PAGES =========== -->
+    <!-- Helper function to create a back button header -->
+    <template id="page-header-template">
+         <header class="content-page-header sticky top-0 z-10 p-4 flex items-center">
+            <button class="back-button p-2 rounded-full hover:bg-sandstone-gold/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-sandstone-gold"><path d="m15 18-6-6 6-6"/></svg>
             </button>
-            <h1 class="text-2xl font-bold text-sandstone-gold">✨ AI Itinerary Planner</h1>
+            <h2 class="text-2xl font-bold text-sandstone-gold text-center flex-grow -ml-10"></h2>
         </header>
-        <main class="p-4 sm:p-6">
-            <div class="max-w-md mx-auto space-y-6">
+    </template>
+    
+    <!-- Itinerary Planner Page -->
+    <div id="planner-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <div class="p-6">
+            <p class="text-center text-lg text-parchment/80 mb-8">Tell us about your perfect day, and we'll craft a unique itinerary just for you.</p>
+            <form id="itinerary-form" class="space-y-6 max-w-lg mx-auto">
                 <div>
-                    <h2 class="text-2xl font-bold text-sandstone-gold">Tell us about your visit</h2>
-                    <p class="text-parchment/70 mt-2">Let our AI guide craft the perfect itinerary for you.</p>
+                    <label class="block text-sandstone-gold font-semibold mb-2">How much time do you have?</label>
+                    <select id="visit-duration" class="w-full bg-gray-800 border border-sandstone-gold rounded-lg p-3 text-parchment focus:ring-yellow-500 focus:border-yellow-500">
+                        <option>A quick visit (1-2 hours)</option>
+                        <option selected>A leisurely half-day</option>
+                        <option>A full day experience</option>
+                    </select>
                 </div>
-                
-                <div id="planner-form">
-                    <div>
-                        <label class="font-bold text-sandstone-gold">What are your interests?</label>
-                        <div class="grid grid-cols-2 gap-4 mt-2">
-                            <label class="flex items-center space-x-2"><input type="checkbox" name="interest" value="History & Heritage" class="form-checkbox text-sandstone-gold bg-transparent border-sandstone-gold"><span>History</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" name="interest" value="Shopping" class="form-checkbox text-sandstone-gold bg-transparent border-sandstone-gold"><span>Shopping</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" name="interest" value="Food & Drink" class="form-checkbox text-sandstone-gold bg-transparent border-sandstone-gold"><span>Food & Drink</span></label>
-                            <label class="flex items-center space-x-2"><input type="checkbox" name="interest" value="Arts & Crafts" class="form-checkbox text-sandstone-gold bg-transparent border-sandstone-gold"><span>Arts & Crafts</span></label>
-                        </div>
-                    </div>
-                     <div class="mt-4">
-                        <label class="font-bold text-sandstone-gold">How long will you be here?</label>
-                        <div class="flex flex-col mt-2 space-y-2">
-                            <label class="flex items-center space-x-2"><input type="radio" name="duration" value="about 1 hour" class="form-radio text-sandstone-gold bg-transparent border-sandstone-gold" checked><span>Quick Visit (1 Hour)</span></label>
-                            <label class="flex items-center space-x-2"><input type="radio" name="duration" value="2 to 3 hours" class="form-radio text-sandstone-gold bg-transparent border-sandstone-gold"><span>Leisurely Visit (2-3 Hours)</span></label>
-                            <label class="flex items-center space-x-2"><input type="radio" name="duration" value="a half-day" class="form-radio text-sandstone-gold bg-transparent border-sandstone-gold"><span>Half Day (4+ Hours)</span></label>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 text-center">
-                        <button id="generate-plan-btn" class="w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                           ✨ Generate My Itinerary
-                        </button>
+                <div>
+                    <label class="block text-sandstone-gold font-semibold mb-3">What are your interests?</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="History & Heritage" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>History</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="shopping for unique gifts" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Shopping</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="food & drink" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Food & Drink</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="family fun" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Family Fun</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="art & culture" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Art & Culture</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="relaxing and soaking up the atmosphere" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Relaxing</span></label>
                     </div>
                 </div>
-
-                <div id="itinerary-loader" class="hidden justify-center items-center mt-6">
-                    <div class="loader"></div>
-                    <p class="ml-4 text-sandstone-gold">Crafting your perfect visit...</p>
-                </div>
-
-                <div id="itinerary-result" class="mt-6 p-4 bg-transparent border border-sandstone-gold/50 rounded-lg text-parchment/90">
-                    <!-- AI-generated itinerary will appear here -->
-                </div>
+                <button type="submit" class="w-full p-4 bg-sandstone-gold text-black font-bold text-lg rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">Generate My Itinerary</button>
+            </form>
+            <div id="itinerary-result-container" class="mt-10 max-w-2xl mx-auto hidden">
+                <div class="loader"></div>
+                <div id="itinerary-result" class="prose prose-invert"></div>
             </div>
-        </main>
+        </div>
+    </div>
+    
+    <!-- AR Wayfinder Page -->
+    <div id="ar-page" class="page-section hidden">
+        <div id="ar-back-button-container" class="absolute top-4 left-4 z-20"></div>
+        <div id="ar-instructions" class="ar-overlay">
+            <div>
+                <h2 class="text-3xl font-bold text-sandstone-gold mb-4">AR Wayfinder Activated</h2>
+                <p class="text-lg">Please grant camera access when prompted.</p>
+                <p>Point your device at a Piece Hall marker to see augmented reality content.</p>
+                <button id="close-ar-instructions" class="mt-6 bg-sandstone-gold text-black font-bold py-2 px-4 rounded">Got it!</button>
+            </div>
+        </div>
+        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+            <a-marker preset='hiro'>
+                <a-box position='0 0.5 0' material='color: #B3A369;'></a-box>
+                <a-text value="Welcome to The Piece Hall!" position="-1 1.5 0" rotation="-90 0 0" color="#F5F5DC"></a-text>
+            </a-marker>
+            <a-entity camera></a-entity>
+        </a-scene>
+    </div>
+    
+    <!-- Map & Amenities Page -->
+    <div id="map-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <div class="p-4 md:p-6 text-center">
+             <h3 class="text-2xl font-bold text-sandstone-gold mb-4">Interactive Map</h3>
+             <p class="text-parchment/70 mb-4">Click on a label to highlight an area.</p>
+            <svg id="interactive-map" viewBox="0 0 800 600" class="w-full max-w-4xl mx-auto bg-gray-900 rounded-lg border-2 border-sandstone-gold">
+                <!-- Outer Walls -->
+                <rect x="50" y="50" width="700" height="500" rx="15" fill="#333" stroke="#B3A369" stroke-width="2"/>
+                <!-- Courtyard -->
+                <rect x="150" y="150" width="500" height="300" fill="#222" />
+
+                <!-- Colonnades -->
+                <rect x="150" y="150" width="500" height="50" fill="#444"/> <!-- Top -->
+                <rect x="150" y="400" width="500" height="50" fill="#444"/> <!-- Bottom -->
+                <rect x="150" y="200" width="50" height="200" fill="#444"/> <!-- Left -->
+                <rect x="600" y="200" width="50" height="200" fill="#444"/> <!-- Right -->
+                
+                <!-- Gates -->
+                <g class="map-label" data-area="north-gate">
+                    <rect x="375" y="50" width="50" height="20" fill="#B3A369" />
+                    <text x="400" y="100" fill="#F5F5DC" text-anchor="middle" font-size="18" font-family="Montserrat">North Gate</text>
+                </g>
+                <g class="map-label" data-area="south-gate">
+                    <rect x="375" y="530" width="50" height="20" fill="#B3A369" />
+                    <text x="400" y="495" fill="#F5F5DC" text-anchor="middle" font-size="18" font-family="Montserrat">South Gate</text>
+                </g>
+
+                <!-- Key Locations -->
+                <g class="map-label" data-area="toilets">
+                    <circle cx="185" cy="185" r="10" fill="lightblue" />
+                    <text x="215" y="190" fill="#F5F5DC" font-size="16" font-family="Montserrat">Toilets</text>
+                </g>
+                <g class="map-label" data-area="visitor-centre">
+                    <circle cx="580" cy="420" r="10" fill="lightgreen" />
+                    <text x="500" y="425" fill="#F5F5DC" font-size="16" font-family="Montserrat">Visitor Centre</text>
+                </g>
+                 <g class="map-label" data-area="restaurant">
+                    <circle cx="620" cy="185" r="10" fill="coral" />
+                    <text x="560" y="190" fill="#F5F5DC" font-size="16" font-family="Montserrat">Restaurant</text>
+                </g>
+            </svg>
+            <div class="mt-8 page-content max-w-3xl mx-auto text-left">
+                <h3 class="text-2xl font-bold text-sandstone-gold">Amenities</h3>
+                <ul class="list-disc list-inside space-y-2 text-lg">
+                    <li><strong class="text-sandstone-gold">Toilets & Baby Changing:</strong> Located on the Rustic level near the North Gate entrance.</li>
+                    <li><strong class="text-sandstone-gold">Visitor Centre:</strong> Find maps, gifts, and friendly advice on the Colonnade level near the South Gate.</li>
+                    <li><strong class="text-sandstone-gold">Accessibility:</strong> Lifts are available to access all three levels. The courtyard is wheelchair accessible.</li>
+                    <li><strong class="text-sandstone-gold">Free Wi-Fi:</strong> Connect to 'PieceHall_FreeWiFi' throughout the venue.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="shops-only-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+    </div>
+    
+    <div id="eateries-only-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
     </div>
 
-    <!-- ... Other page sections omitted for brevity but are present in the full file ... -->
+    <div id="events-page" class="page-section hidden bg-black min-h-screen">
+       <!-- Header will be injected here by JS -->
+        <!-- Event content will be injected here -->
+    </div>
+
+    <div id="club-1779-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <div class="p-6 page-content max-w-3xl mx-auto">
+            <div class="text-center mb-8">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 mx-auto text-sandstone-gold mb-4"><path d="M12 2 2.5 6.5v11L12 22l9.5-4.5v-11L12 2z"/><path d="m12 14.5-5-2.5"/><path d="M12 14.5v5.5"/><path d="m12 14.5 5-2.5"/><path d="m17 9.5-5 2.5"/><path d="m7 9.5 5 2.5"/></svg>
+                <h1 class="text-4xl text-sandstone-gold">Join Club 1779 Today</h1>
+                <p class="text-xl text-parchment/80 mt-2">Become part of our story and help protect our future.</p>
+            </div>
+            
+            <h3>Why Your Support Matters</h3>
+            <p>The Piece Hall is the last building of its kind in the world, and it costs £12,000 a day to maintain and run. By joining our members club, you help us protect this iconic heritage site for future generations, ensuring it remains free for everyone to enter and supporting our vibrant events programme.</p>
+            
+            <h3>What's In It For You?</h3>
+            <p>Support us for <strong class="text-sandstone-gold">£39.95 per year</strong> or <strong class="text-sandstone-gold">£500 for a lifetime membership</strong> (£250 for over 65s), and in return you’ll get a host of fantastic perks:</p>
+            <ul class="list-disc list-inside space-y-3 text-lg mt-4">
+                <li>Access to presales for a selection of 'Live at The Piece Hall' gigs, shows and workshops.</li>
+                <li>Invites to exclusive club members’ events and previews.</li>
+                <li>Money off vouchers and special offers at participating Piece Hall outlets.</li>
+                <li>A specially designed tote bag and a bespoke badge.</li>
+                <li>A free heritage tour and a chance to ring The Piece Hall Bell.</li>
+            </ul>
+            <a href="https://thepiecehall.digitickets.co.uk/category/39263" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">Become a Club 1779 Member</a>
+        </div>
+    </div>
+
+    <div id="history-page" class="page-section hidden bg-black min-h-screen">
+       <!-- Header will be injected here by JS -->
+        <div class="p-6 page-content max-w-3xl mx-auto">
+            <img src="https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/day.jpg" alt="A sunny day in The Piece Hall Courtyard" class="rounded-lg mb-6 w-full h-auto">
+            <p class="text-xl italic text-parchment/80">"Yorkshire’s most important secular building, the only remaining Georgian cloth hall in the world."</p>
+            
+            <h3>A Monument to Trade</h3>
+            <p>Opened on New Year's Day in 1779, The Piece Hall was a grand statement of wealth and ambition. It was built as a marketplace for the trading of 'pieces' of cloth—30-yard lengths of hand-woven woollen fabric. For over 50 years, this magnificent building was the epicentre of the global woollen trade, a stunning combination of commerce and culture, and the pride of Halifax.</p>
+
+            <h3>An Icon Reimagined</h3>
+            <p>As the Industrial Revolution introduced machinery and mills, the traditional hand-weaving trade declined, and so did The Piece Hall's original purpose. But the building adapted. In 1868, it was gifted to the town and transformed into a bustling wholesale market. It became a public square for all occasions, hosting everything from political rallies and huge concerts to spectacles like the first hot air balloon ascents in 1824.</p>
+
+            <h3>Conservation and The Future</h3>
+            <p>Despite falling into disrepair, the building's significance was recognised when it was made an Ancient Monument in 1928. After the wholesale market closed, a major restoration in the 1970s saved it from demolition. Another multi-million-pound transformation, completed in 2017, has secured its future. Today, The Piece Hall is a vibrant cultural and commercial heart for Halifax, home to independent shops, bars, cafes, and a world-class events programme, continuing its story for a new generation.</p>
+            
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <a href="https://www.thepiecehall.co.uk/heritage/heritage-spaces/" target="_blank" rel="noopener noreferrer" class="block p-4 bg-sandstone-gold text-black font-bold text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                    Explore Heritage Spaces
+                 </a>
+                 <a href="https://www.thepiecehall.co.uk/heritage/heritage-tours/" target="_blank" rel="noopener noreferrer" class="block p-4 bg-sandstone-gold text-black font-bold text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                    Book a Heritage Tour
+                 </a>
+            </div>
+        </div>
+    </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const pageLinks = document.querySelectorAll('.page-link');
         const pageSections = document.querySelectorAll('.page-section');
         const dateElement = document.getElementById('current-date');
-        let arInitialized = false;
+        const hubPage = document.getElementById('hub-page');
+        let navigationStack = ['hub-page'];
 
+        // --- PWA & DYNAMIC CONTENT ---
+        const manifestData = {
+            "name": "The Piece Hall Kiosk", "short_name": "Piece Hall", "start_url": ".", "display": "standalone", "background_color": "#000000", "theme_color": "#000000",
+            "description": "Your official digital guide to The Piece Hall, Halifax.",
+            "icons": [{"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png", "sizes": "192x192", "type": "image/png" }, {"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-512.png", "sizes": "512x512", "type": "image/png" }]
+        };
+        const manifestString = JSON.stringify(manifestData);
+        const manifestBlob = new Blob([manifestString], { type: 'application/json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        document.querySelector('#manifest').setAttribute('href', manifestUrl);
+        
         function updateDateTime() {
             const now = new Date();
             const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-            const dateString = now.toLocaleDateString('en-GB', dateOptions);
-            const timeString = now.toLocaleTimeString('en-US', timeOptions);
-            dateElement.textContent = `${dateString} | ${timeString}`;
+            dateElement.textContent = `${now.toLocaleDateString('en-GB', dateOptions)} | ${now.toLocaleTimeString('en-US', timeOptions)}`;
         }
 
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
-
-        const pieceHallData = {
-            history: `The Piece Hall is a Grade I listed building from 1779, originally a cloth hall for trading 'pieces' of woollen fabric. It's the world's only remaining Georgian cloth hall and one of Britain's most outstanding Georgian buildings. It represents the wealth and ambition of the 18th-century cloth manufacturers.`,
-            shops: [
-                'The Society of Alchemists (Gifts)', 'Little Acorn Gifts (Gifts)', 'The Jam Shack (Leisure)', 'Antiques by Rachel (Homeware)', 'Indian Summer (Fashion)', 
-                'Flockitt and Broom (Gifts)', 'Hudson Belle (Gifts, Homeware)', 'Beet13juice (Fashion)', 'Blast From The Past (Leisure)', 'The Escaporium (Leisure)', 
-                'Pages N\' Pixels (Toys & Collectables)', 'Replicar (Toys & Collectables)', 'Harveys of Halifax (Gifts)', 'A Piece of Christmas (Gifts)', 'Al\'s Emporium (Homeware)', 
-                'The Yorkshire Soap Company (Gifts)', 'The Book Corner (Leisure)', 'The Handmade Gift Shop (Arts & Crafts, Gifts)', 'Mrs Sinclair\'s Vintage (Fashion)', 
-                'Leon K Dewhurst (Fashion)', 'Jewella (Fashion)', 'Mystical & Magical (Gifts)', 'Jitterbug Jean (Fashion)', 'House of 925 (Fashion)', 
-                'Creative Crystals (Arts & Crafts)', 'The Yorkshire Gallery (Arts & Crafts)', 'Brown Paper Packages (Gifts)'
-            ],
-            eateries: [
-                'The Trading Rooms (Restaurant and bar)', 'The Deli (Local food & drink)', 'The Wine Barrel (Craft beer, wine)', 'Di\'s Pies (Food & Drink)', 'Just Gaia (Food & Drink)', 
-                'Sweet Tooth (Sweets)', 'The Chocolate Box (Chocolates)', 'Loafers (Coffee and Vinyl Records)'
-            ]
-        };
-
-        // --- GEMINI API INTEGRATION ---
-        const generatePlanBtn = document.getElementById('generate-plan-btn');
-        const itineraryLoader = document.getElementById('itinerary-loader');
-        const itineraryResult = document.getElementById('itinerary-result');
-        
-        function markdownToHtml(text) {
-            let html = text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')     
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>') 
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                .replace(/^\* (.*$)/gim, '<li>$1</li>');
-            html = html.replace(/<li>/g, '<ul><li>').replace(/<\/li>\n(?!<li>)/g, '</li></ul>');
-            return html.trim();
+        function setDynamicBackground() {
+            const hour = new Date().getHours();
+            let imageUrl;
+            if (hour >= 5 && hour < 12) imageUrl = 'https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/morning.jpg';
+            else if (hour >= 12 && hour < 18) imageUrl = 'https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/day.jpg';
+            else imageUrl = 'https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/night.jpg';
+            hubPage.style.backgroundImage = `url('${imageUrl}')`;
         }
 
-        generatePlanBtn.addEventListener('click', async () => {
-            const selectedInterests = Array.from(document.querySelectorAll('input[name="interest"]:checked')).map(el => el.value);
-            const selectedDuration = document.querySelector('input[name="duration"]:checked').value;
-
-            if (selectedInterests.length === 0) {
-                itineraryResult.innerHTML = '<p>Please select at least one interest.</p>';
-                return;
+        // --- NAVIGATION ---
+        function showPage(targetId) {
+            pageSections.forEach(page => page.classList.toggle('hidden', page.id !== targetId));
+            window.scrollTo(0, 0);
+            const aScene = document.querySelector('a-scene');
+            if(aScene) {
+                if(targetId === 'ar-page') aScene.play(); else aScene.pause();
             }
+            if (targetId !== navigationStack[navigationStack.length - 1]) {
+                navigationStack.push(targetId);
+            }
+        }
+        
+        function goBack() {
+             if (navigationStack.length > 1) {
+                navigationStack.pop();
+                showPage(navigationStack[navigationStack.length - 1]);
+            }
+        }
 
-            itineraryLoader.style.display = 'flex';
-            itineraryResult.innerHTML = '';
+        pageLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(link.getAttribute('data-target'));
+            });
+        });
 
-            const systemPrompt = `You are a friendly and knowledgeable tour guide for The Piece Hall in Halifax. Your task is to create a personalized itinerary for a visitor.
-            - The itinerary should be presented in a clear, step-by-step format with engaging descriptions.
-            - Use markdown for formatting: use '###' for subheadings and '*' for list items. Use **bold** for place names.
-            - Start with a welcoming sentence.
-            - Conclude with a friendly closing remark like "Enjoy your visit!".
-            - Base your recommendations ONLY on the provided context.`;
-            
-            const userQuery = `Create an itinerary for a visit lasting ${selectedDuration}, focusing on the following interests: ${selectedInterests.join(', ')}.
-            Context:
-            - History: ${pieceHallData.history}
-            - Shops available: ${pieceHallData.shops.join(', ')}.
-            - Eateries available: ${pieceHallData.eateries.join(', ')}.`;
+        document.querySelectorAll('.back-button').forEach(button => {
+            button.addEventListener('click', goBack);
+        });
+
+        let touchStartX = 0;
+        document.body.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+        document.body.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX > touchStartX + 75) {
+                goBack();
+            }
+        });
+        
+        document.querySelectorAll('a[href^="http"]').forEach(link => {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+        });
+
+        // --- PAGE INJECTIONS & SETUP ---
+        function createPageHeader(pageId, title) {
+            const page = document.getElementById(pageId);
+            if (!page) return;
+            const template = document.getElementById('page-header-template');
+            const header = template.content.cloneNode(true);
+            header.querySelector('h2').textContent = title;
+            page.prepend(header);
+            page.querySelector('.back-button').addEventListener('click', goBack);
+        }
+        
+        const pageTitles = {
+            "planner-page": "Itinerary Planner", "map-page": "Wayfinding & Amenities", "shops-only-page": "Shops",
+            "eateries-only-page": "Eateries", "events-page": "Events & Tickets", "club-1779-page": "Club 1779",
+            "history-page": "History & Heritage"
+        };
+        for(const [id, title] of Object.entries(pageTitles)) {
+            createPageHeader(id, title);
+        }
+
+        function createDirectoryPage(pageId, title, items) {
+             const page = document.getElementById(pageId);
+             const content = document.createElement('div');
+             content.className = 'p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto';
+             items.forEach(item => {
+                let buttonHtml = '';
+                if (item.link) {
+                    buttonHtml = `<div class="mt-4">
+                                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">More Info</a>
+                                  </div>`;
+                }
+
+                content.innerHTML += `
+                    <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-5 flex flex-col">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold text-sandstone-gold">${item.name}</h3>
+                            <p class="text-sm text-sandstone-gold/70 mb-2">${item.category}</p>
+                            <p class="text-parchment/80">${item.description}</p>
+                        </div>
+                        ${buttonHtml}
+                    </div>
+                `;
+             });
+             page.appendChild(content);
+        }
+
+        function createEventsPage(pageId, events) {
+            const page = document.getElementById(pageId);
+            let content = `
+                <div class="p-6 page-content max-w-3xl mx-auto">
+                    <p class="text-center text-xl mb-8 text-parchment/80">Experience world-class music, arts, and culture in our spectacular courtyard.</p>
+                    <div class="space-y-8">
+            `;
+            events.forEach(event => {
+                content += `
+                    <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-6">
+                        <p class="text-sm font-semibold text-sandstone-gold">${event.date}</p>
+                        <h3 class="text-2xl mt-1 mb-2">${event.name}</h3>
+                        <p class="text-parchment/80 mb-4">${event.description}</p>
+                        <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">View Event</a>
+                    </div>
+                `;
+            });
+            content += `
+                    </div>
+                    <a href="https://www.thepiecehall.co.uk/events/" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">View Full Events Calendar</a>
+                </div>
+            `;
+            page.innerHTML += content;
+        }
+
+        createEventsPage('events-page', [
+             { name: 'Paint and Sip: Cocktail night', date: '26th September 2025', description: 'Unleash your creativity with a paintbrush in one hand and a cocktail in the other in this fun, relaxed workshop.', link: 'https://www.thepiecehall.co.uk/event/paint-and-sip-cocktail-night/'},
+             { name: 'Book Signing with Simon Armitage', date: '6th October 2025', description: 'Meet the Poet Laureate, Simon Armitage, and get your book signed in this special literary event.', link: 'https://www.thepiecehall.co.uk/event/book-signing-with-poet-laureate-simon-armitage/'},
+             { name: 'Real Markets at The Piece Hall', date: '12th October 2025', description: 'Explore a vibrant market featuring local produce, crafts, and delicious street food from the region\'s finest artisans.', link: 'https://www.thepiecehall.co.uk/event/real-markets-at-the-piece-hall-2/'},
+             { name: 'The Piece Hall Christmas Market', date: 'Weekends from 14th Nov - 21st Dec 2025', description: 'Get into the festive spirit with our magical Christmas market, featuring unique gifts, seasonal treats, and live music.', link: 'https://www.thepiecehall.co.uk/event/christmas-markets/'},
+             { name: 'Christmas Parties at The Piece Hall', date: '1st - 22nd December 2025', description: 'Celebrate the festive season in style with a special Christmas party in our unique and historic venue.', link: 'https://www.thepiecehall.co.uk/event/christmas-parties-at-the-piece-hall/'},
+             { name: 'ETHEL CAIN', date: '20th June 2026', description: 'A live music performance by the acclaimed artist Ethel Cain in the spectacular open-air courtyard.', link: 'https://www.thepiecehall.co.uk/event/ethel-cain/'},
+             { name: 'David Gray', date: '5th July 2026', description: 'Enjoy an unforgettable evening of music with celebrated singer-songwriter David Gray.', link: 'https://www.thepiecehall.co.uk/event/david-gray/'},
+             { name: 'The K’s', date: '8th August 2026', description: 'High-energy indie rock comes to the courtyard with a much-anticipated performance from The K\'s.', link: 'https://www.thepiecehall.co.uk/event/the-ks/'}
+        ]);
+
+        createDirectoryPage('shops-only-page', 'Shops', [
+            { name: 'The Society of Alchemists', category: 'Gifts', description: 'Unique and curious gifts with a touch of magic and mystery.', link: '#' },
+            { name: 'Little Acorn Gifts', category: 'Gifts', description: 'Charming gifts and keepsakes for all ages.', link: '#' },
+            { name: 'Indian Summer', category: 'Fashion & Accessories', description: 'Bohemian-inspired fashion, accessories, and homeware.', link: '#' },
+            { name: 'Hudson Belle', category: 'Gifts & Homeware', description: 'A curated collection of stylish gifts, homeware, and lifestyle products.', link: '#' },
+            { name: 'The Escaporium', category: 'Leisure', description: 'Thrilling escape room experiences for groups of all sizes.', link: '#' },
+            { name: 'The Yorkshire Soap Company', category: 'Gifts', description: 'Handmade soaps, bath treats, and beautifully scented gifts.', link: '#' },
+            { name: 'The Book Corner', category: 'Leisure & Books', description: 'A charming independent bookshop with a curated selection of reads.', link: '#' },
+            { name: 'Just Gaia', category: 'Food & Drink', description: 'An eco-friendly store offering zero-waste refills and sustainable products.', link: '#' },
+            { name: 'Creative Crystals', category: 'Arts & Crafts', description: 'A dazzling array of crystals, gemstones, and holistic gifts.', link: '#' },
+            { name: 'The Yorkshire Gallery', category: 'Arts & Crafts', description: 'Showcasing paintings and sculptures from talented Yorkshire artists.', link: '#' },
+            { name: 'Jitterbug Jean', category: 'Fashion & Accessories', description: 'Vintage and retro-inspired clothing and accessories.', link: '#' },
+            { name: 'The Handmade Gift Shop', category: 'Arts & Crafts', description: 'A wonderful collection of items from local makers and artists.', link: '#' }
+        ]);
+        createDirectoryPage('eateries-only-page', 'Eateries', [
+            { name: 'The Hop Yard', category: 'Bar', description: 'A specialist craft beer bar offering a wide selection of local and international brews.', link: '#' },
+            { name: 'La Piazza', category: 'Cafe', description: 'Authentic Italian coffee and pastries, bringing a taste of Italy to the courtyard.', link: '#' },
+            { name: 'The Trading Rooms', category: 'Bar & Restaurant', description: 'Fine dining with a menu inspired by Yorkshire produce. Perfect for a special occasion.', link: '#' },
+            { name: 'The Deli', category: 'Cafe & Artisan Foods', description: 'Pick up delicious cheeses, cured meats, and local preserves to take home.', link: '#' },
+            { name: 'The Astronomer Diner', category: 'Cafe & Diner', description: 'A quirky, space-themed diner serving American classics and delicious milkshakes.', link: '#' },
+            { name: 'The Wine Barrel', category: 'Wine Bar', description: 'An intimate bar offering a wide selection of fine wines and charcuterie boards.', link: '#' },
+            { name: 'The Bakery', category: 'Bar & Cafe', description: 'Freshly baked bread, cakes, and sandwiches, with a charming cafe space to enjoy them.', link: '#' },
+            { name: 'Loafers', category: 'Bar & Cafe', description: 'A unique blend of a record store and a cafe, serving great coffee and vinyl culture.', link: '#' }
+        ]);
+
+
+        // --- GEMINI API ITINERARY PLANNER ---
+        const itineraryForm = document.getElementById('itinerary-form');
+        const resultContainer = document.getElementById('itinerary-result-container');
+        const itineraryResultDiv = document.getElementById('itinerary-result');
+        const loader = resultContainer.querySelector('.loader');
+
+        itineraryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            resultContainer.style.display = 'block';
+            loader.style.display = 'block';
+            itineraryResultDiv.innerHTML = '';
+
+            const duration = document.getElementById('visit-duration').value;
+            const interests = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.dataset.interest);
+            const interestsText = interests.length > 0 ? interests.join(', ') : 'a bit of everything';
+
+            const systemPrompt = `You are a friendly and knowledgeable tour guide for The Piece Hall in Halifax, a unique Grade I listed Georgian cloth hall. A visitor is asking for a personalized itinerary. Based on their interests and the time they have, create a suggested plan for their visit. The Piece Hall has a mix of independent shops, bars, cafes, restaurants, a heritage space, and a large central courtyard that hosts events. Format the output using markdown with friendly headings and bullet points. Be enthusiastic and welcoming, and start with a cheerful greeting.`;
+            const userQuery = `I am visiting The Piece Hall. I have ${duration} to spend and my interests are: ${interestsText}. Please create a wonderful, personalized itinerary for me.`;
 
             try {
-                const apiKey = ""; 
+                const apiKey = ""; // API key will be injected
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 
                 const payload = {
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
                     contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
                 };
 
                 const response = await fetch(apiUrl, {
@@ -300,29 +588,77 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
+
                 if (!response.ok) {
-                    throw new Error(`API error: ${response.statusText}`);
+                    throw new Error(`API Error: ${response.statusText}`);
                 }
 
                 const result = await response.json();
-                const text = result.candidates[0].content.parts[0].text;
-                itineraryResult.innerHTML = markdownToHtml(text);
-
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (text) {
+                    itineraryResultDiv.innerHTML = simpleMarkdownToHtml(text);
+                } else {
+                    itineraryResultDiv.innerHTML = `<p class="text-center text-red-400">Sorry, I couldn't generate an itinerary at this time. Please try again later.</p>`;
+                }
             } catch (error) {
-                console.error("Error calling Gemini API:", error);
-                itineraryResult.innerHTML = '<p>Sorry, I couldn\'t create a plan at this time. Please try again later.</p>';
+                console.error("Error fetching itinerary:", error);
+                itineraryResultDiv.innerHTML = `<p class="text-center text-red-400">An error occurred. Please check your connection and try again.</p>`;
             } finally {
-                itineraryLoader.style.display = 'none';
+                loader.style.display = 'none';
             }
         });
+        
+        function simpleMarkdownToHtml(md) {
+            return md
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h3>$1</h3>') // Also handle ##
+                .replace(/^# (.*$)/gim, '<h3>$1</h3>') // Also handle #
+                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*)\*/gim, '<li>$1</li>')
+                .replace(/^(?!<li|<\/ul>|<h3>|<strong>|<p>)(.*)$/gim, '<p>$1</p>')
+                .replace(/<\/li>\s*<p>/gim, '</li>') // Clean up paragraphs after list items
+                .replace(/<\/p>\s*<li>/gim, '<ul><li>') // Start list
+                .replace(/<\/li>\s*<p>/gim, '</li></ul><p>') // End list
+                .replace(/<li>/g, '<ul><li>') // Ensure lists are wrapped
+                .replace(/<\/li>/g, '</li></ul>')
+                .replace(/<\/ul>\s*<ul>/g, ''); // Fix nested list tags
+        }
+        
+        // --- AR PAGE LOGIC ---
+        const arInstructions = document.getElementById('ar-instructions');
+        const closeArInstructions = document.getElementById('close-ar-instructions');
+        const arBackButtonContainer = document.getElementById('ar-back-button-container');
 
-        // --- AR LOGIC AND NAVIGATION ---
-        // The rest of the script for AR and page navigation remains here...
-        // ... (omitted for brevity) ...
+        const backButtonClone = document.querySelector('.back-button').cloneNode(true);
+        backButtonClone.addEventListener('click', goBack);
+        arBackButtonContainer.appendChild(backButtonClone);
+        
+        closeArInstructions.addEventListener('click', () => {
+            arInstructions.style.display = 'none';
+        });
+
+        // --- MAP PAGE LOGIC ---
+        const mapLabels = document.querySelectorAll('#interactive-map .map-label');
+        mapLabels.forEach(label => {
+            label.addEventListener('click', () => {
+                mapLabels.forEach(l => l.style.opacity = '0.7');
+                label.style.opacity = '1';
+            });
+        });
+
+
+        // --- INITIALIZATION ---
+        updateDateTime();
+        setDynamicBackground();
+        setInterval(updateDateTime, 60000);
     });
 </script>
-
 </body>
 </html>
+
+
+
+
+
 
