@@ -232,22 +232,7 @@
     
     <!-- AR Wayfinder Page -->
     <div id="ar-page" class="page-section hidden">
-        <div id="ar-back-button-container" class="absolute top-4 left-4 z-20"></div>
-        <div id="ar-instructions" class="ar-overlay">
-            <div>
-                <h2 class="text-3xl font-bold text-sandstone-gold mb-4">AR Wayfinder Activated</h2>
-                <p class="text-lg">Please grant camera access when prompted.</p>
-                <p>Point your device at a Piece Hall marker to see augmented reality content.</p>
-                <button id="close-ar-instructions" class="mt-6 bg-sandstone-gold text-black font-bold py-2 px-4 rounded">Got it!</button>
-            </div>
-        </div>
-        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-            <a-marker preset='hiro'>
-                <a-box position='0 0.5 0' material='color: #B3A369;'></a-box>
-                <a-text value="Welcome to The Piece Hall!" position="-1 1.5 0" rotation="-90 0 0" color="#F5F5DC"></a-text>
-            </a-marker>
-            <a-entity camera></a-entity>
-        </a-scene>
+        <!-- AR content will be dynamically injected here -->
     </div>
     
     <!-- Map & Amenities Page -->
@@ -402,15 +387,57 @@
             else imageUrl = 'https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/night.jpg';
             hubPage.style.backgroundImage = `url('${imageUrl}')`;
         }
+        
+        // --- AR SCENE MANAGEMENT ---
+        function initAR() {
+            const arPage = document.getElementById('ar-page');
+            arPage.innerHTML = `
+                <div id="ar-back-button-container" class="absolute top-4 left-4 z-20"></div>
+                <div id="ar-instructions" class="ar-overlay">
+                    <div>
+                        <h2 class="text-3xl font-bold text-sandstone-gold mb-4">AR Wayfinder Activated</h2>
+                        <p class="text-lg">Please grant camera access when prompted.</p>
+                        <p>Point your device at a Piece Hall marker to see augmented reality content.</p>
+                        <button id="close-ar-instructions" class="mt-6 bg-sandstone-gold text-black font-bold py-2 px-4 rounded">Got it!</button>
+                    </div>
+                </div>
+                <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+                    <a-marker preset='hiro'>
+                        <a-box position='0 0.5 0' material='color: #B3A369;'></a-box>
+                        <a-text value="Welcome to The Piece Hall!" position="-1 1.5 0" rotation="-90 0 0" color="#F5F5DC"></a-text>
+                    </a-marker>
+                    <a-entity camera></a-entity>
+                </a-scene>
+            `;
+            // Re-attach event listeners for the newly created elements
+            document.getElementById('close-ar-instructions').addEventListener('click', () => {
+                document.getElementById('ar-instructions').style.display = 'none';
+            });
+            const backButtonClone = document.querySelector('#page-header-template .back-button').cloneNode(true);
+            backButtonClone.addEventListener('click', goBack);
+            document.getElementById('ar-back-button-container').appendChild(backButtonClone);
+        }
+
+        function destroyAR() {
+            const arPage = document.getElementById('ar-page');
+            const aScene = arPage.querySelector('a-scene');
+            if (aScene) {
+                aScene.pause(); // Important to release camera
+                arPage.innerHTML = ''; // Clear the content
+            }
+        }
 
         // --- NAVIGATION ---
         function showPage(targetId) {
+            destroyAR(); // Always destroy AR scene when navigating
+            
             pageSections.forEach(page => page.classList.toggle('hidden', page.id !== targetId));
             window.scrollTo(0, 0);
-            const aScene = document.querySelector('a-scene');
-            if(aScene) {
-                if(targetId === 'ar-page') aScene.play(); else aScene.pause();
+            
+            if (targetId === 'ar-page') {
+                initAR(); // Initialize AR only when navigating to its page
             }
+            
             if (targetId !== navigationStack[navigationStack.length - 1]) {
                 navigationStack.push(targetId);
             }
@@ -430,13 +457,13 @@
             });
         });
 
-        document.querySelectorAll('.back-button').forEach(button => {
-            button.addEventListener('click', goBack);
-        });
-
         let touchStartX = 0;
         document.body.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
         document.body.addEventListener('touchend', e => {
+            const currentTarget = document.querySelector('.page-section:not(.hidden)');
+            // Disable swipe back on the main hub page
+            if (currentTarget && currentTarget.id === 'hub-page') return;
+
             const touchEndX = e.changedTouches[0].screenX;
             if (touchEndX > touchStartX + 75) {
                 goBack();
@@ -626,19 +653,6 @@
                 .replace(/<\/ul>\s*<ul>/g, ''); // Fix nested list tags
         }
         
-        // --- AR PAGE LOGIC ---
-        const arInstructions = document.getElementById('ar-instructions');
-        const closeArInstructions = document.getElementById('close-ar-instructions');
-        const arBackButtonContainer = document.getElementById('ar-back-button-container');
-
-        const backButtonClone = document.querySelector('.back-button').cloneNode(true);
-        backButtonClone.addEventListener('click', goBack);
-        arBackButtonContainer.appendChild(backButtonClone);
-        
-        closeArInstructions.addEventListener('click', () => {
-            arInstructions.style.display = 'none';
-        });
-
         // --- MAP PAGE LOGIC ---
         const mapLabels = document.querySelectorAll('#interactive-map .map-label');
         mapLabels.forEach(label => {
