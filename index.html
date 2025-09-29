@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Welcome to The Piece Hall</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- A-Frame and AR.js libraries for Web AR -->
@@ -19,10 +19,10 @@
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png">
 
     <style>
-        /* Embedded Shared Styles */
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #000000;
+            overflow-x: hidden;
         }
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Playfair Display', serif;
@@ -35,17 +35,13 @@
             background-color: #111111;
             border-bottom: 1px solid #B3A369;
         }
-        /* Helper class to hide/show pages */
         .page-section.hidden {
             display: none;
         }
-        /* Styles for AR overlay elements */
         .ar-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             z-index: 20;
             display: flex;
             flex-direction: column;
@@ -55,10 +51,11 @@
             color: white;
             text-align: center;
             padding: 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
         }
-        /* Custom styles for planner */
         #itinerary-result h3 {
-            font-size: 1.5rem; /* Larger than before */
+            font-size: 1.5rem;
             font-family: 'Playfair Display', serif;
             font-weight: bold;
             color: #B3A369;
@@ -94,13 +91,11 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        /* Dynamic Background Style */
         #hub-page {
             background-size: cover;
             background-position: center;
             transition: background-image 1s ease-in-out;
         }
-        /* General page content styling */
         .page-content {
             line-height: 1.7;
             font-size: 1.1rem;
@@ -114,6 +109,40 @@
         .page-content p {
             margin-bottom: 1rem;
         }
+
+        @media (max-width: 640px) {
+            h1, h2, h3 {
+                font-size: 1.25rem !important;
+            }
+            .page-content {
+                font-size: 1rem !important;
+            }
+            #itinerary-result h3 {
+                font-size: 1.15rem !important;
+            }
+            .ar-overlay {
+                padding: 8px;
+            }
+            #interactive-map text {
+                font-size: 12px !important;
+            }
+            #interactive-map .map-label rect,
+            #interactive-map .map-label circle {
+                stroke-width: 4 !important;
+            }
+        }
+
+        input[type="checkbox"], input[type="radio"] {
+            width: 1.5em;
+            height: 1.5em;
+        }
+        label {
+            font-size: 1.1em;
+        }
+        .back-button {
+            min-width: 44px;
+            min-height: 44px;
+        }
     </style>
 </head>
 <body class="text-parchment" style="overflow-x: hidden;">
@@ -122,62 +151,62 @@
     <main id="hub-page" class="page-section min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
         <div class="w-full max-w-md mx-auto text-center bg-black bg-opacity-60 p-6 rounded-lg">
             <header class="mb-10">
-                <svg class="h-20 mx-auto mb-6" viewBox="0 0 100 125" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50.003 0C22.383 0 0 22.383 0 50.003s22.383 50.003 50.003 50.003 50.003-22.383 50.003-50.003S77.623 0 50.003 0zm0 91.672c-23.008 0-41.669-18.66-41.669-41.669S26.995 8.334 50.003 8.334s41.669 18.66 41.669 41.669-18.66 41.669-41.669 41.669z" fill="#F5F5DC"/><path d="M50.003 16.667C31.583 16.667 16.667 31.583 16.667 50.003c0 18.42 14.916 33.336 33.336 33.336 18.42 0 33.336-14.916 33.336-33.336 0-18.42-14.916-33.336-33.336-33.336zm-8.334 52.78V30.557h16.668v13.89h-8.334v21.523l8.334.004v13.89h-16.668z" fill="#F5F5DC"/></svg>
+                <svg class="h-20 mx-auto mb-6" viewBox="0 0 100 125" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50.003 0C22.383 0 0 22.383 0 50.003s22.383 50.003 50.003 50.003 50.003-22.[...]
                 <h1 class="text-4xl md:text-5xl font-bold text-sandstone-gold">Welcome to The Piece Hall</h1>
                 <p class="text-lg text-parchment/70 mt-2" id="current-date">Your guide for today</p>
             </header>
             <div class="space-y-4">
-                 <button data-target="planner-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                 <button data-target="planner-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 [...]
                     <span class="text-2xl mr-4">✨</span>
                     <span class="flex-grow text-left">Plan My Visit</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                <button data-target="ar-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                <button data-target="ar-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">AR Wayfinder</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                <button data-target="map-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <button data-target="map-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">Wayfinding & Amenities</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                 <button data-target="shops-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                 <button data-target="shops-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-2[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">Shops</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                 <button data-target="eateries-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M16 2a5 5 0 0 0-9 2.46L6 6h12l-1-1.54A5 5 0 0 0 16 2Z"/><path d="M6 6h12v3c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V6Z"/><path d="M6 13h12l-2 8H8l-2-8Z"/><path d="m12 6 1.4-2.5"/></svg>
+                 <button data-target="eateries-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duratio[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">Eateries</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                <button data-target="events-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m16 14-4 4-2-2"/></svg>
+                <button data-target="events-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 ho[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">Events & Tickets</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                <button data-target="club-1779-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M12 2 2.5 6.5v11L12 22l9.5-4.5v-11L12 2z"/><path d="m12 14.5-5-2.5"/><path d="M12 14.5v5.5"/><path d="m12 14.5 5-2.5"/><path d="m17 9.5-5 2.5"/><path d="m7 9.5 5 2.5"/></svg>
+                <button data-target="club-1779-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">Club 1779</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
-                <button data-target="history-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M12 5v14"/><path d="M18 5v14"/><path d="M22 19H2"/><path d="M18 5a4 4 0 0 0-8 0"/><path d="M12 5a4 4 0 0 1 8 0"/><path d="M6 5v14"/></svg>
+                <button data-target="history-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 h[...]
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                     <span class="flex-grow text-left">History & Heritage</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"[...]
                 </button>
             </div>
             <footer class="mt-12">
                 <div class="flex justify-center space-x-6">
                     <a href="https://www.facebook.com/thepiecehallhalifax/" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="ro[...]
                     </a>
                     <a href="https://www.instagram.com/thepiecehallhalifax/" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Instagram">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="ro[...]
                     </a>
                     <a href="https://twitter.com/ThePieceHall" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Twitter/X">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.9 3.3 4.9s-1.4.6-2.8.4c-1.2 2.2-4.1 4.5-8.2 4.5-2.8 0-4.5-1.2-5.7-2.9-3.4 2.1-8.5 2.1-8.5 2.1s2.5-4.4 7.1-7.2c-1.5-1.4-2.8-3.4-2.8-3.4s1.2-.6 2.3-.2c1.1-2.2 4.1-4.5 8.2-4.5 2.8 0 4.5 1.2 5.7 2.9Z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="ro[...]
                     </a>
                 </div>
             </footer>
@@ -189,7 +218,7 @@
     <template id="page-header-template">
          <header class="content-page-header sticky top-0 z-10 p-4 grid grid-cols-[auto_1fr_auto] items-center gap-2">
             <button class="back-button p-2 rounded-full hover:bg-sandstone-gold/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-sandstone-gold"><path d="m15 18-6-6 6-6"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" cla[...]
             </button>
             <h2 class="text-2xl font-bold text-sandstone-gold text-center truncate"></h2>
             <div class="w-10 h-10"></div> <!-- Invisible spacer to balance the back button -->
@@ -213,15 +242,15 @@
                 <div>
                     <label class="block text-sandstone-gold font-semibold mb-3">What are your interests?</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="History & Heritage" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>History</span></label>
-                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="shopping for unique gifts" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Shopping</span></label>
-                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="food & drink" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Food & Drink</span></label>
-                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="family fun" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Family Fun</span></label>
-                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="art & culture" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Art & Culture</span></label>
-                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg"><input type="checkbox" data-interest="relaxing and soaking up the atmosphere" class="h-5 w-5 rounded bg-gray-700 border-gray-600 text-yellow-600 focus:ring-yellow-500"><span>Relaxing</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg" aria-label="History & Heritage"><input type="checkbox" data-interest="History & Heritage" class="h-6 w-6 rounded bg-gray-700"><span>History & Heritage</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg" aria-label="Shopping for unique gifts"><input type="checkbox" data-interest="shopping for unique gifts" class="h-6 w-6 rounded bg-gray-700"><span>Shopping for unique gifts</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg" aria-label="Food & drink"><input type="checkbox" data-interest="food & drink" class="h-6 w-6 rounded bg-gray-700"><span>Food & drink</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg" aria-label="Family fun"><input type="checkbox" data-interest="family fun" class="h-6 w-6 rounded bg-gray-700"><span>Family fun</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg" aria-label="Art & culture"><input type="checkbox" data-interest="art & culture" class="h-6 w-6 rounded bg-gray-700"><span>Art & culture</span></label>
+                        <label class="flex items-center space-x-3 p-3 bg-gray-800 border border-gray-700 rounded-lg" aria-label="Relaxing and soaking up the atmosphere"><input type="checkbox" data-interest="relaxing and soaking up the atmosphere" class="h-6 w-6 rounded bg-gray-700"><span>Relaxing and soaking up the atmosphere</span></label>
                     </div>
                 </div>
-                <button type="submit" class="w-full p-4 bg-sandstone-gold text-black font-bold text-lg rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">Generate My Itinerary</button>
+                <button type="submit" class="w-full p-4 bg-sandstone-gold text-black font-bold text-lg rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500 min-h-[48px]">Generate My Itinerary</button>
             </form>
             <div id="itinerary-result-container" class="mt-10 max-w-2xl mx-auto hidden">
                 <div class="loader"></div>
@@ -255,8 +284,8 @@
         <!-- Header will be injected here by JS -->
         <div class="p-4 md:p-6 text-center">
              <h3 class="text-2xl font-bold text-sandstone-gold mb-4">Interactive Map</h3>
-             <p class="text-parchment/70 mb-4">Click on a label to highlight an area.</p>
-            <svg id="interactive-map" viewBox="0 0 800 600" class="w-full max-w-4xl mx-auto bg-gray-900 rounded-lg border-2 border-sandstone-gold">
+             <p class="text-parchment/70 mb-4">Tap a label to highlight an area. Pinch to zoom if needed.</p>
+            <svg id="interactive-map" viewBox="0 0 800 600" class="w-full max-w-4xl mx-auto bg-gray-900 rounded-lg border-2 border-sandstone-gold" style="touch-action: manipulation;">
                 <!-- Outer Walls -->
                 <rect x="50" y="50" width="700" height="500" rx="15" fill="#333" stroke="#B3A369" stroke-width="2"/>
                 <!-- Courtyard -->
@@ -321,16 +350,16 @@
         <!-- Header will be injected here by JS -->
         <div class="p-6 page-content max-w-3xl mx-auto">
             <div class="text-center mb-8">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 mx-auto text-sandstone-gold mb-4"><path d="M12 2 2.5 6.5v11L12 22l9.5-4.5v-11L12 2z"/><path d="m12 14.5-5-2.5"/><path d="M12 14.5v5.5"/><path d="m12 14.5 5-2.5"/><path d="m17 9.5-5 2.5"/><path d="m7 9.5 5 2.5"/></svg>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" cl[...]
                 <h1 class="text-4xl text-sandstone-gold">Join Club 1779 Today</h1>
                 <p class="text-xl text-parchment/80 mt-2">Become part of our story and help protect our future.</p>
             </div>
             
             <h3>Why Your Support Matters</h3>
-            <p>The Piece Hall is the last building of its kind in the world, and it costs £12,000 a day to maintain and run. By joining our members club, you help us protect this iconic heritage site for future generations, ensuring it remains free for everyone to enter and supporting our vibrant events programme.</p>
+            <p>The Piece Hall is the last building of its kind in the world, and it costs £12,000 a day to maintain and run. By joining our members club, you help us protect this iconic heritage site[...]
             
             <h3>What's In It For You?</h3>
-            <p>Support us for <strong class="text-sandstone-gold">£39.95 per year</strong> or <strong class="text-sandstone-gold">£500 for a lifetime membership</strong> (£250 for over 65s), and in return you’ll get a host of fantastic perks:</p>
+            <p>Support us for <strong class="text-sandstone-gold">£39.95 per year</strong> or <strong class="text-sandstone-gold">£500 for a lifetime membership</strong> (£250 for over 65s), and in[...]
             <ul class="list-disc list-inside space-y-3 text-lg mt-4">
                 <li>Access to presales for a selection of 'Live at The Piece Hall' gigs, shows and workshops.</li>
                 <li>Invites to exclusive club members’ events and previews.</li>
@@ -338,7 +367,7 @@
                 <li>A specially designed tote bag and a bespoke badge.</li>
                 <li>A free heritage tour and a chance to ring The Piece Hall Bell.</li>
             </ul>
-            <a href="https://thepiecehall.digitickets.co.uk/category/39263" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">Become a Club 1779 Member</a>
+            <a href="https://thepiecehall.digitickets.co.uk/category/39263" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bo[...]
         </div>
     </div>
 
@@ -349,19 +378,19 @@
             <p class="text-xl italic text-parchment/80">"Yorkshire’s most important secular building, the only remaining Georgian cloth hall in the world."</p>
             
             <h3>A Monument to Trade</h3>
-            <p>Opened on New Year's Day in 1779, The Piece Hall was a grand statement of wealth and ambition. It was built as a marketplace for the trading of 'pieces' of cloth—30-yard lengths of hand-woven woollen fabric. For over 50 years, this magnificent building was the epicentre of the global woollen trade, a stunning combination of commerce and culture, and the pride of Halifax.</p>
-
+            <p>Opened on New Year's Day in 1779, The Piece Hall was a grand statement of wealth and ambition. It was built as a marketplace for the trading of 'pieces' of cloth—30-yard lengths of ha[...]
+    
             <h3>An Icon Reimagined</h3>
-            <p>As the Industrial Revolution introduced machinery and mills, the traditional hand-weaving trade declined, and so did The Piece Hall's original purpose. But the building adapted. In 1868, it was gifted to the town and transformed into a bustling wholesale market. It became a public square for all occasions, hosting everything from political rallies and huge concerts to spectacles like the first hot air balloon ascents in 1824.</p>
-
+            <p>As the Industrial Revolution introduced machinery and mills, the traditional hand-weaving trade declined, and so did The Piece Hall's original purpose. But the building adapted. In 1868[...]
+    
             <h3>Conservation and The Future</h3>
-            <p>Despite falling into disrepair, the building's significance was recognised when it was made an Ancient Monument in 1928. After the wholesale market closed, a major restoration in the 1970s saved it from demolition. Another multi-million-pound transformation, completed in 2017, has secured its future. Today, The Piece Hall is a vibrant cultural and commercial heart for Halifax, home to independent shops, bars, cafes, and a world-class events programme, continuing its story for a new generation.</p>
+            <p>Despite falling into disrepair, the building's significance was recognised when it was made an Ancient Monument in 1928. After the wholesale market closed, a major restoration in the 19[...]
             
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <a href="https://www.thepiecehall.co.uk/heritage/heritage-spaces/" target="_blank" rel="noopener noreferrer" class="block p-4 bg-sandstone-gold text-black font-bold text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                 <a href="https://www.thepiecehall.co.uk/heritage/heritage-spaces/" target="_blank" rel="noopener noreferrer" class="block p-4 bg-sandstone-gold text-black font-bold text-center rounde[...]
                     Explore Heritage Spaces
                  </a>
-                 <a href="https://www.thepiecehall.co.uk/heritage/heritage-tours/" target="_blank" rel="noopener noreferrer" class="block p-4 bg-sandstone-gold text-black font-bold text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                 <a href="https://www.thepiecehall.co.uk/heritage/heritage-tours/" target="_blank" rel="noopener noreferrer" class="block p-4 bg-sandstone-gold text-black font-bold text-center rounded[...]
                     Book a Heritage Tour
                  </a>
             </div>
@@ -380,7 +409,7 @@
         const manifestData = {
             "name": "The Piece Hall Kiosk", "short_name": "Piece Hall", "start_url": ".", "display": "standalone", "background_color": "#000000", "theme_color": "#000000",
             "description": "Your official digital guide to The Piece Hall, Halifax.",
-            "icons": [{"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png", "sizes": "192x192", "type": "image/png" }, {"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-512.png", "sizes": "512x512", "type": "image/png" }]
+            "icons": [{"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png", "sizes": "192x192", "type": "image/png" }, {"src": "https://raw.githubuserconten[...]
         };
         const manifestString = JSON.stringify(manifestData);
         const manifestBlob = new Blob([manifestString], { type: 'application/json' });
@@ -476,7 +505,7 @@
                 let buttonHtml = '';
                 if (item.link) {
                     buttonHtml = `<div class="mt-4">
-                                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">More Info</a>
+                                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover[...]
                                   </div>`;
                 }
 
@@ -507,27 +536,27 @@
                         <p class="text-sm font-semibold text-sandstone-gold">${event.date}</p>
                         <h3 class="text-2xl mt-1 mb-2">${event.name}</h3>
                         <p class="text-parchment/80 mb-4">${event.description}</p>
-                        <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">View Event</a>
+                        <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-[...]
                     </div>
                 `;
             });
             content += `
                     </div>
-                    <a href="https://www.thepiecehall.co.uk/events/" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">View Full Events Calendar</a>
+                    <a href="https://www.thepiecehall.co.uk/events/" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text[...]
                 </div>
             `;
             page.innerHTML += content;
         }
 
         createEventsPage('events-page', [
-             { name: 'Paint and Sip: Cocktail night', date: '26th September 2025', description: 'Unleash your creativity with a paintbrush in one hand and a cocktail in the other in this fun, relaxed workshop.', link: 'https://www.thepiecehall.co.uk/event/paint-and-sip-cocktail-night/'},
-             { name: 'Book Signing with Simon Armitage', date: '6th October 2025', description: 'Meet the Poet Laureate, Simon Armitage, and get your book signed in this special literary event.', link: 'https://www.thepiecehall.co.uk/event/book-signing-with-poet-laureate-simon-armitage/'},
-             { name: 'Real Markets at The Piece Hall', date: '12th October 2025', description: 'Explore a vibrant market featuring local produce, crafts, and delicious street food from the region\'s finest artisans.', link: 'https://www.thepiecehall.co.uk/event/real-markets-at-the-piece-hall-2/'},
-             { name: 'The Piece Hall Christmas Market', date: 'Weekends from 14th Nov - 21st Dec 2025', description: 'Get into the festive spirit with our magical Christmas market, featuring unique gifts, seasonal treats, and live music.', link: 'https://www.thepiecehall.co.uk/event/christmas-markets/'},
-             { name: 'Christmas Parties at The Piece Hall', date: '1st - 22nd December 2025', description: 'Celebrate the festive season in style with a special Christmas party in our unique and historic venue.', link: 'https://www.thepiecehall.co.uk/event/christmas-parties-at-the-piece-hall/'},
-             { name: 'ETHEL CAIN', date: '20th June 2026', description: 'A live music performance by the acclaimed artist Ethel Cain in the spectacular open-air courtyard.', link: 'https://www.thepiecehall.co.uk/event/ethel-cain/'},
-             { name: 'David Gray', date: '5th July 2026', description: 'Enjoy an unforgettable evening of music with celebrated singer-songwriter David Gray.', link: 'https://www.thepiecehall.co.uk/event/david-gray/'},
-             { name: 'The K’s', date: '8th August 2026', description: 'High-energy indie rock comes to the courtyard with a much-anticipated performance from The K\'s.', link: 'https://www.thepiecehall.co.uk/event/the-ks/'}
+             { name: 'Paint and Sip: Cocktail night', date: '26th September 2025', description: 'Unleash your creativity with a paintbrush in one hand and a cocktail in the other in this fun, relaxed [...]
+             { name: 'Book Signing with Simon Armitage', date: '6th October 2025', description: 'Meet the Poet Laureate, Simon Armitage, and get your book signed in this special literary event.', link[...]
+             { name: 'Real Markets at The Piece Hall', date: '12th October 2025', description: 'Explore a vibrant market featuring local produce, crafts, and delicious street food from the region\'s f[...]
+             { name: 'The Piece Hall Christmas Market', date: 'Weekends from 14th Nov - 21st Dec 2025', description: 'Get into the festive spirit with our magical Christmas market, featuring unique gi[...]
+             { name: 'Christmas Parties at The Piece Hall', date: '1st - 22nd December 2025', description: 'Celebrate the festive season in style with a special Christmas party in our unique and histo[...]
+             { name: 'ETHEL CAIN', date: '20th June 2026', description: 'A live music performance by the acclaimed artist Ethel Cain in the spectacular open-air courtyard.', link: 'https://www.thepiec[...]
+             { name: 'David Gray', date: '5th July 2026', description: 'Enjoy an unforgettable evening of music with celebrated singer-songwriter David Gray.', link: 'https://www.thepiecehall.co.uk/ev[...]
+             { name: 'The K’s', date: '8th August 2026', description: 'High-energy indie rock comes to the courtyard with a much-anticipated performance from The K\'s.', link: 'https://www.thepieceh[...]
         ]);
 
         createDirectoryPage('shops-only-page', 'Shops', [
@@ -572,7 +601,7 @@
             const interests = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.dataset.interest);
             const interestsText = interests.length > 0 ? interests.join(', ') : 'a bit of everything';
 
-            const systemPrompt = `You are a friendly and knowledgeable tour guide for The Piece Hall in Halifax, a unique Grade I listed Georgian cloth hall. A visitor is asking for a personalized itinerary. Based on their interests and the time they have, create a suggested plan for their visit. The Piece Hall has a mix of independent shops, bars, cafes, restaurants, a heritage space, and a large central courtyard that hosts events. Format the output using markdown with friendly headings and bullet points. Be enthusiastic and welcoming, and start with a cheerful greeting.`;
+            const systemPrompt = `You are a friendly and knowledgeable tour guide for The Piece Hall in Halifax, a unique Grade I listed Georgian cloth hall. A visitor is asking for a personalized iti[...]
             const userQuery = `I am visiting The Piece Hall. I have ${duration} to spend and my interests are: ${interestsText}. Please create a wonderful, personalized itinerary for me.`;
 
             try {
@@ -613,17 +642,17 @@
         function simpleMarkdownToHtml(md) {
             return md
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h3>$1</h3>') // Also handle ##
-                .replace(/^# (.*$)/gim, '<h3>$1</h3>') // Also handle #
+                .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^# (.*$)/gim, '<h3>$1</h3>')
                 .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
                 .replace(/\*(.*)\*/gim, '<li>$1</li>')
                 .replace(/^(?!<li|<\/ul>|<h3>|<strong>|<p>)(.*)$/gim, '<p>$1</p>')
-                .replace(/<\/li>\s*<p>/gim, '</li>') // Clean up paragraphs after list items
-                .replace(/<\/p>\s*<li>/gim, '<ul><li>') // Start list
-                .replace(/<\/li>\s*<p>/gim, '</li></ul><p>') // End list
-                .replace(/<li>/g, '<ul><li>') // Ensure lists are wrapped
+                .replace(/<\/li>\s*<p>/gim, '</li>')
+                .replace(/<\/p>\s*<li>/gim, '<ul><li>')
+                .replace(/<\/li>\s*<p>/gim, '</li></ul><p>')
+                .replace(/<li>/g, '<ul><li>')
                 .replace(/<\/li>/g, '</li></ul>')
-                .replace(/<\/ul>\s*<ul>/g, ''); // Fix nested list tags
+                .replace(/<\/ul>\s*<ul>/g, '');
         }
         
         // --- AR PAGE LOGIC ---
@@ -657,10 +686,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
