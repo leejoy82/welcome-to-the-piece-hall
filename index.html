@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to The Piece Hall</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- A-Frame and AR.js libraries for Web AR -->
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <!-- PWA Manifest and Theme Color -->
-    <link rel="manifest" id="manifest">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png">
+
+    <!-- Google Translate API -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <style>
         /* Embedded Shared Styles */
@@ -38,23 +38,6 @@
         /* Helper class to hide/show pages */
         .page-section.hidden {
             display: none;
-        }
-        /* Styles for AR overlay elements */
-        .ar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(0,0,0,0.8);
-            color: white;
-            text-align: center;
-            padding: 20px;
         }
         /* Custom styles for planner */
         #itinerary-result h3 {
@@ -114,6 +97,35 @@
         .page-content p {
             margin-bottom: 1rem;
         }
+        /* Donation button styling */
+        .donation-amount-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .donation-amount-btn.selected {
+            background-color: #B3A369;
+            color: black;
+            border-color: #B3A369;
+            transform: scale(1.05);
+        }
+        /* Google Translate Widget Styling */
+        #google_translate_element .goog-te-combo {
+            background-color: #111111;
+            color: #B3A369;
+            border: 1px solid #B3A369;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .goog-te-gadget-simple {
+            background-color: transparent !important;
+            border: none !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value span {
+            color: #B3A369 !important;
+        }
+        body > .skiptranslate {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="text-parchment" style="overflow-x: hidden;">
@@ -121,25 +133,42 @@
     <!-- =========== HOME HUB PAGE =========== -->
     <main id="hub-page" class="page-section min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
         <div class="w-full max-w-md mx-auto text-center bg-black bg-opacity-60 p-6 rounded-lg">
-            <header class="mb-10">
-                <svg class="h-20 mx-auto mb-6" viewBox="0 0 100 125" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50.003 0C22.383 0 0 22.383 0 50.003s22.383 50.003 50.003 50.003 50.003-22.383 50.003-50.003S77.623 0 50.003 0zm0 91.672c-23.008 0-41.669-18.66-41.669-41.669S26.995 8.334 50.003 8.334s41.669 18.66 41.669 41.669-18.66 41.669-41.669 41.669z" fill="#F5F5DC"/><path d="M50.003 16.667C31.583 16.667 16.667 31.583 16.667 50.003c0 18.42 14.916 33.336 33.336 33.336 18.42 0 33.336-14.916 33.336-33.336 0-18.42-14.916-33.336-33.336-33.336zm-8.334 52.78V30.557h16.668v13.89h-8.334v21.523l8.334.004v13.89h-16.668z" fill="#F5F5DC"/></svg>
-                <h1 class="text-4xl md:text-5xl font-bold text-sandstone-gold">Welcome to The Piece Hall</h1>
+            <header class="mb-10 text-parchment">
+                <img src="https://www.thepiecehall.co.uk/wp-content/uploads/2021/06/ThePieceHall_Logo_white.png" alt="The Piece Hall Logo" class="h-16 w-auto mx-auto mb-6">
+                <h1 class="text-4xl md:text-5xl font-bold text-sandstone-gold" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.7);">Welcome to The Piece Hall</h1>
                 <p class="text-lg text-parchment/70 mt-2" id="current-date">Your guide for today</p>
             </header>
+            
+            <!-- Search and Translate -->
+            <div class="mb-6 flex justify-between items-center gap-4">
+                <div id="google_translate_element"></div>
+                <form id="search-form" class="flex-grow">
+                    <div class="relative">
+                        <input type="search" id="search-input" placeholder="Search..." class="w-full bg-gray-800 border-2 border-sandstone-gold rounded-full py-2 px-4 pl-10 text-parchment focus:ring-yellow-500 focus:border-yellow-500">
+                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-sandstone-gold" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                </form>
+            </div>
+            
             <div class="space-y-4">
                  <button data-target="planner-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <span class="text-2xl mr-4">✨</span>
                     <span class="flex-grow text-left">Plan My Visit</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
-                <button data-target="ar-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                    <span class="flex-grow text-left">AR Wayfinder</span>
+                <button data-target="news-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4M4 9h16M4 15h16M10 3v6"/></svg>
+                    <span class="flex-grow text-left">Latest News</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <button data-target="offers-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <span class="flex-grow text-left">Discounts & Offers</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
                 <button data-target="map-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <span class="flex-grow text-left">Wayfinding & Amenities</span>
+                    <span class="flex-grow text-left">Map & Facilities</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
                  <button data-target="shops-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
@@ -149,7 +178,7 @@
                 </button>
                  <button data-target="eateries-only-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M16 2a5 5 0 0 0-9 2.46L6 6h12l-1-1.54A5 5 0 0 0 16 2Z"/><path d="M6 6h12v3c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V6Z"/><path d="M6 13h12l-2 8H8l-2-8Z"/><path d="m12 6 1.4-2.5"/></svg>
-                    <span class="flex-grow text-left">Eateries</span>
+                    <span class="flex-grow text-left">Food & Drink</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
                 <button data-target="events-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
@@ -167,8 +196,25 @@
                     <span class="flex-grow text-left">History & Heritage</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
+                <button data-target="rooms-page" class="page-link flex items-center w-full p-4 bg-sandstone-gold text-black font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span class="flex-grow text-left">Rooms & Hire</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                 <button data-target="donate-page" class="page-link flex items-center w-full p-4 bg-green-600 text-white font-semibold rounded-lg shadow-lg transform transition-all duration-200 hover:bg-green-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    <span class="flex-grow text-left">Donate & Support</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
             </div>
-            <footer class="mt-12">
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button id="enable-notifications-btn" class="w-full p-3 bg-gray-700 text-sandstone-gold font-semibold rounded-lg shadow-lg hover:bg-gray-600">Enable Notifications</button>
+                <button id="install-app-btn" class="w-full p-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-500 hidden">Add to Home Screen</button>
+            </div>
+            <div class="mt-8">
+                <a href="./admin.html" target="_blank" class="text-sm text-parchment/60 hover:text-sandstone-gold transition-colors">Staff & Trader Portal</a>
+            </div>
+            <footer class="mt-4">
                 <div class="flex justify-center space-x-6">
                     <a href="https://www.facebook.com/thepiecehallhalifax/" target="_blank" class="text-parchment/60 transition-colors duration-200 hover:text-sandstone-gold" aria-label="Facebook">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -187,12 +233,16 @@
     <!-- =========== CONTENT PAGES =========== -->
     <!-- Helper function to create a back button header -->
     <template id="page-header-template">
-         <header class="content-page-header sticky top-0 z-10 p-4 grid grid-cols-[auto_1fr_auto] items-center gap-2">
-            <button class="back-button p-2 rounded-full hover:bg-sandstone-gold/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-sandstone-gold"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <h2 class="text-2xl font-bold text-sandstone-gold text-center truncate"></h2>
-            <div class="w-10 h-10"></div> <!-- Invisible spacer to balance the back button -->
+         <header class="content-page-header sticky top-0 z-10 p-4 grid grid-cols-[64px_1fr_64px] items-center gap-2">
+            <div class="flex justify-start">
+                <button class="back-button p-2 rounded-full hover:bg-sandstone-gold/20 transition-transform active:scale-90">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-sandstone-gold"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+            </div>
+            <h2 class="text-3xl font-bold text-sandstone-gold text-center truncate" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.7);"></h2>
+            <div class="flex justify-end">
+                <img src="https://www.thepiecehall.co.uk/wp-content/uploads/2021/06/ThePieceHall_Logo_white.png" alt="The Piece Hall Logo" class="h-10 w-auto">
+            </div>
         </header>
     </template>
     
@@ -230,9 +280,44 @@
         </div>
     </div>
     
-    <!-- AR Wayfinder Page -->
-    <div id="ar-page" class="page-section hidden">
-        <!-- AR content will be dynamically injected here -->
+    <!-- Offers Page -->
+    <div id="offers-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <main class="p-6 page-content max-w-4xl mx-auto">
+             <div id="offers-content">
+                <!-- Offers will be dynamically loaded here or show loader -->
+                <div class="loader"></div>
+             </div>
+        </main>
+    </div>
+
+
+     <!-- Donate Page -->
+    <div id="donate-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <div class="p-6 max-w-lg mx-auto text-center">
+            <h3 class="text-3xl font-bold text-sandstone-gold">Support The Piece Hall</h3>
+            <p class="text-lg mt-2 mb-8 text-parchment/80">Your donation helps preserve this iconic landmark for future generations. Thank you!</p>
+            
+            <div id="payment-ui">
+                <div class="mb-6">
+                    <label class="block text-sandstone-gold font-semibold mb-3">Choose an amount (GBP)</label>
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <button class="donation-amount-btn p-4 border-2 border-sandstone-gold rounded-lg font-bold text-lg" data-amount="5">£5</button>
+                        <button class="donation-amount-btn p-4 border-2 border-sandstone-gold rounded-lg font-bold text-lg selected" data-amount="10">£10</button>
+                        <button class="donation-amount-btn p-4 border-2 border-sandstone-gold rounded-lg font-bold text-lg" data-amount="25">£25</button>
+                    </div>
+                    <input type="number" id="custom-amount" placeholder="Or enter a custom amount" class="w-full bg-gray-800 border border-sandstone-gold rounded-lg p-3 text-parchment focus:ring-yellow-500 focus:border-yellow-500 text-center">
+                </div>
+                
+                <button id="payment-button" class="w-full p-4 bg-green-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-500 transition-colors">
+                    Donate with Apple/Google Pay
+                </button>
+                <p id="payment-support-message" class="text-sm mt-4 text-parchment/60 hidden">Web payments are not supported on this browser.</p>
+            </div>
+            
+            <div id="payment-status" class="mt-8"></div>
+        </div>
     </div>
     
     <!-- Map & Amenities Page -->
@@ -278,7 +363,7 @@
                 </g>
             </svg>
             <div class="mt-8 page-content max-w-3xl mx-auto text-left">
-                <h3 class="text-2xl font-bold text-sandstone-gold">Amenities</h3>
+                <h3 class="text-2xl font-bold text-sandstone-gold">Facilities</h3>
                 <ul class="list-disc list-inside space-y-2 text-lg">
                     <li><strong class="text-sandstone-gold">Toilets & Baby Changing:</strong> Located on the Rustic level near the North Gate entrance.</li>
                     <li><strong class="text-sandstone-gold">Visitor Centre:</strong> Find maps, gifts, and friendly advice on the Colonnade level near the South Gate.</li>
@@ -353,6 +438,192 @@
         </div>
     </div>
 
+    <div id="rooms-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <main class="p-6 page-content max-w-4xl mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl text-sandstone-gold">Private Hire</h1>
+                <p class="text-xl text-parchment/80 mt-2">Host an unforgettable event in our unique, Grade I listed setting.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Room 1 Card -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                    <img src="https://www.thepiecehall.co.uk/wp-content/uploads/2021/07/Caygill_Wedding-Breakfast-scaled.jpg" alt="The Caygill Rooms set for a wedding breakfast" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">The Caygill Rooms</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">With floor to ceiling windows, state-of-the-art AV equipment and stunning views, this versatile space is perfect for conferences, weddings, and dinners.</p>
+                        <ul class="text-lg space-y-2">
+                            <li><strong>Gallery:</strong> up to 81</li>
+                            <li><strong>Main Room:</strong> up to 129</li>
+                            <li><strong>Main Room with Bar:</strong> up to 118</li>
+                            <li><strong>Dining:</strong> up to 100</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Syndicate Room 1 -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                    <img src="https://placehold.co/600x400/333333/B3A369?text=Syndicate+Room+1" alt="Placeholder for Syndicate Room 1" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">Syndicate Room 1</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">Ideal for breakout sessions, interviews, or intimate meetings, offering a private and professional setting.</p>
+                        <ul class="text-lg space-y-2">
+                            <li><strong>Boardroom:</strong> up to 36</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Syndicate Room 2 -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                    <img src="https://placehold.co/600x400/333333/B3A369?text=Syndicate+Room+2" alt="Placeholder for Syndicate Room 2" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">Syndicate Room 2</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">A second, similar space perfect for smaller groups, ensuring privacy and focus for your meeting or session.</p>
+                        <ul class="text-lg space-y-2">
+                            <li><strong>Boardroom:</strong> up to 27</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Dinsdale Room -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                    <img src="https://placehold.co/600x400/333333/B3A369?text=Dinsdale+Room" alt="Placeholder for Dinsdale Room" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">Dinsdale Room</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">The Dinsdale Room is a flexible space perfect for medium-sized workshops, presentations, and private receptions.</p>
+                        <ul class="text-lg space-y-2">
+                            <li><strong>Function Room:</strong> up to 47</li>
+                    
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Art Gallery -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                    <img src="https://placehold.co/600x400/333333/B3A369?text=The+Art+Gallery" alt="Placeholder for The Art Gallery" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">The Art Gallery</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">Host your event surrounded by inspiring art. The gallery provides a unique and cultured backdrop for receptions and networking events.</p>
+                        <ul class="text-lg space-y-2">
+                            <li><strong>Reception:</strong> up to 240</li>
+                            <li><strong>Conference and Function:</strong> up to 63</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Trading Rooms Gallery -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                    <img src="https://placehold.co/600x400/333333/B3A369?text=Trading+Rooms+Gallery" alt="Placeholder for The Trading Rooms Gallery" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">The Trading Rooms Gallery</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">An exclusive gallery space within The Trading Rooms restaurant, offering a sophisticated setting for private dining and intimate gatherings.</p>
+                        <ul class="text-lg space-y-2">
+                            <li><strong>Dining:</strong> up to 40</li>
+                            <li><strong>Conference and Function:</strong> up to 100</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Courtyard Card -->
+                <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col md:col-span-2 overflow-hidden">
+                     <img src="https://www.thepiecehall.co.uk/wp-content/uploads/2021/04/the-pice-hall.jpg" alt="A wide shot of The Piece Hall courtyard during an event" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl mt-0">The Courtyard</h3>
+                        <p class="text-parchment/80 mb-4 flex-grow">Our spectacular 66,000 sq ft open-air courtyard is available for large-scale events, from concerts and festivals to markets and brand activations.</p>
+                         <ul class="text-lg space-y-2">
+                            <li><strong>Standing Capacity:</strong> up to 7,734</li>
+                            <li>An iconic backdrop for any major event.</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://www.thepiecehall.co.uk/private-hire/" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500">Make an Enquiry</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Search Results Page -->
+    <div id="search-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <main class="p-6" id="search-results-container"></main>
+    </div>
+    
+    <!-- Latest News Page -->
+    <div id="news-page" class="page-section hidden bg-black min-h-screen">
+       <!-- Header will be injected here by JS -->
+        <!-- News content will be injected here -->
+    </div>
+    
+     <!-- Trader Portal Page -->
+    <div id="trader-portal-page" class="page-section hidden bg-black min-h-screen">
+        <!-- Header will be injected here by JS -->
+        <main class="p-6 page-content max-w-4xl mx-auto">
+            <!-- Login View -->
+            <div id="trader-login-view">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl text-sandstone-gold">Trader Portal</h1>
+                    <p class="text-xl text-parchment/80 mt-2">Manage your shop's inventory for the app.</p>
+                </div>
+                <form id="trader-login-form" class="space-y-6 max-w-sm mx-auto">
+                    <div>
+                        <label for="trader-email" class="block text-sandstone-gold font-semibold mb-2">Email</label>
+                        <input type="email" id="trader-email" required class="w-full bg-gray-800 border border-sandstone-gold rounded-lg p-3 text-parchment focus:ring-yellow-500 focus:border-yellow-500" placeholder="your-shop@email.com">
+                    </div>
+                    <div>
+                        <label for="trader-password" class="block text-sandstone-gold font-semibold mb-2">Password</label>
+                        <input type="password" id="trader-password" required class="w-full bg-gray-800 border border-sandstone-gold rounded-lg p-3 text-parchment focus:ring-yellow-500 focus:border-yellow-500">
+                    </div>
+                    <button type="submit" class="w-full p-4 bg-sandstone-gold text-black font-bold text-lg rounded-lg shadow-lg hover:bg-yellow-500">Login</button>
+                    <p class="text-xs text-parchment/60 text-center">This is a demo. Any email/password will work.</p>
+                </form>
+            </div>
+            
+            <!-- Stock Management View -->
+            <div id="stock-management-view" class="hidden">
+                 <h2 class="text-3xl font-bold text-sandstone-gold mb-6">Manage Your Stock</h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl text-sandstone-gold/80 mb-4">Add New Product</h3>
+                        <form id="add-stock-form" class="space-y-4">
+                             <div>
+                                <label for="product-name" class="block font-semibold mb-1">Product Name</label>
+                                <input type="text" id="product-name" required class="w-full rounded p-2 form-input">
+                            </div>
+                             <div>
+                                <label for="product-desc" class="block font-semibold mb-1">Description</label>
+                                <textarea id="product-desc" rows="3" required class="w-full rounded p-2 form-input"></textarea>
+                            </div>
+                            <div>
+                                <label for="product-price" class="block font-semibold mb-1">Price (£)</label>
+                                <input type="number" step="0.01" id="product-price" required class="w-full rounded p-2 form-input">
+                            </div>
+                            <button type="submit" class="w-full p-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg">Add Product</button>
+                        </form>
+                    </div>
+                    <div>
+                         <h3 class="text-xl text-sandstone-gold/80 mb-4">Current Listings</h3>
+                         <div id="stock-list-container" class="space-y-4 max-h-96 overflow-y-auto">
+                             <p class="text-gray-400">Your products will appear here.</p>
+                         </div>
+                    </div>
+                 </div>
+            </div>
+        </main>
+    </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const pageLinks = document.querySelectorAll('.page-link');
@@ -362,15 +633,7 @@
         let navigationStack = ['hub-page'];
 
         // --- PWA & DYNAMIC CONTENT ---
-        const manifestData = {
-            "name": "The Piece Hall Kiosk", "short_name": "Piece Hall", "start_url": ".", "display": "standalone", "background_color": "#000000", "theme_color": "#000000",
-            "description": "Your official digital guide to The Piece Hall, Halifax.",
-            "icons": [{"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-192.png", "sizes": "192x192", "type": "image/png" }, {"src": "https://raw.githubusercontent.com/leejoy82/welcome-to-the-piece-hall/main/icon-512.png", "sizes": "512x512", "type": "image/png" }]
-        };
-        const manifestString = JSON.stringify(manifestData);
-        const manifestBlob = new Blob([manifestString], { type: 'application/json' });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
-        document.querySelector('#manifest').setAttribute('href', manifestUrl);
+        // This is now handled by the static manifest.json file
         
         function updateDateTime() {
             const now = new Date();
@@ -388,55 +651,63 @@
             hubPage.style.backgroundImage = `url('${imageUrl}')`;
         }
         
-        // --- AR SCENE MANAGEMENT ---
-        function initAR() {
-            const arPage = document.getElementById('ar-page');
-            arPage.innerHTML = `
-                <div id="ar-back-button-container" class="absolute top-4 left-4 z-20"></div>
-                <div id="ar-instructions" class="ar-overlay">
-                    <div>
-                        <h2 class="text-3xl font-bold text-sandstone-gold mb-4">AR Wayfinder Activated</h2>
-                        <p class="text-lg">Please grant camera access when prompted.</p>
-                        <p>Point your device at a Piece Hall marker to see augmented reality content.</p>
-                        <button id="close-ar-instructions" class="mt-6 bg-sandstone-gold text-black font-bold py-2 px-4 rounded">Got it!</button>
-                    </div>
-                </div>
-                <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-                    <a-marker preset='hiro'>
-                        <a-box position='0 0.5 0' material='color: #B3A369;'></a-box>
-                        <a-text value="Welcome to The Piece Hall!" position="-1 1.5 0" rotation="-90 0 0" color="#F5F5DC"></a-text>
-                    </a-marker>
-                    <a-entity camera></a-entity>
-                </a-scene>
-            `;
-            // Re-attach event listeners for the newly created elements
-            document.getElementById('close-ar-instructions').addEventListener('click', () => {
-                document.getElementById('ar-instructions').style.display = 'none';
-            });
-            const backButtonClone = document.querySelector('#page-header-template .back-button').cloneNode(true);
-            backButtonClone.addEventListener('click', goBack);
-            document.getElementById('ar-back-button-container').appendChild(backButtonClone);
-        }
+        // --- NOTIFICATION LOGIC ---
+        function initializePushNotifications() {
+            const enableNotificationsButton = document.getElementById('enable-notifications-btn');
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                navigator.serviceWorker.register('sw.js').then(swReg => {
+                    console.log('Service Worker is registered', swReg);
+                }).catch(error => {
+                    console.error('Service Worker Error', error);
+                });
 
-        function destroyAR() {
-            const arPage = document.getElementById('ar-page');
-            const aScene = arPage.querySelector('a-scene');
-            if (aScene) {
-                aScene.pause(); // Important to release camera
-                arPage.innerHTML = ''; // Clear the content
+                enableNotificationsButton.addEventListener('click', () => {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            console.log('Notification permission granted.');
+                            // In a real app, you would get the subscription and send it to your server
+                             enableNotificationsButton.textContent = 'Notifications Enabled';
+                             enableNotificationsButton.disabled = true;
+                        } else {
+                            console.log('Notification permission denied.');
+                        }
+                    });
+                });
+            } else {
+                console.warn('Push notifications not supported in this browser.');
+                enableNotificationsButton.style.display = 'none';
             }
         }
+
+        // --- PWA INSTALL PROMPT ---
+        let deferredPrompt;
+        const installButton = document.getElementById('install-app-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.classList.remove('hidden');
+        });
+
+        installButton.addEventListener('click', async () => {
+            installButton.classList.add('hidden');
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installButton.classList.add('hidden');
+            deferredPrompt = null;
+            console.log('PWA was installed');
+        });
 
         // --- NAVIGATION ---
         function showPage(targetId) {
-            destroyAR(); // Always destroy AR scene when navigating
             
             pageSections.forEach(page => page.classList.toggle('hidden', page.id !== targetId));
             window.scrollTo(0, 0);
-            
-            if (targetId === 'ar-page') {
-                initAR(); // Initialize AR only when navigating to its page
-            }
             
             if (targetId !== navigationStack[navigationStack.length - 1]) {
                 navigationStack.push(targetId);
@@ -487,112 +758,286 @@
         }
         
         const pageTitles = {
-            "planner-page": "Itinerary Planner", "map-page": "Wayfinding & Amenities", "shops-only-page": "Shops",
-            "eateries-only-page": "Eateries", "events-page": "Events & Tickets", "club-1779-page": "Club 1779",
-            "history-page": "History & Heritage"
+            "planner-page": "Itinerary Planner", "map-page": "Map & Facilities", "shops-only-page": "Shops",
+            "eateries-only-page": "Food & Drink", "events-page": "Events & Tickets", "club-1779-page": "Club 1779",
+            "history-page": "History & Heritage", "donate-page": "Donate & Support", "rooms-page": "Rooms & Hire",
+            "offers-page": "Discounts & Offers", "search-page": "Search Results", "news-page": "Latest News",
+            "trader-portal-page": "Trader Portal"
         };
         for(const [id, title] of Object.entries(pageTitles)) {
             createPageHeader(id, title);
         }
 
-        function createDirectoryPage(pageId, title, items) {
+        function createDirectoryPage(pageId, items, message) {
              const page = document.getElementById(pageId);
-             const content = document.createElement('div');
-             content.className = 'p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto';
-             items.forEach(item => {
-                let buttonHtml = '';
-                if (item.link) {
-                    buttonHtml = `<div class="mt-4">
-                                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">More Info</a>
-                                  </div>`;
-                }
+             // Clear previous content except for the header
+             while(page.children.length > 1) {
+                page.removeChild(page.lastChild);
+             }
 
-                content.innerHTML += `
-                    <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-5 flex flex-col">
-                        <div class="flex-grow">
-                            <h3 class="text-xl font-bold text-sandstone-gold">${item.name}</h3>
-                            <p class="text-sm text-sandstone-gold/70 mb-2">${item.category}</p>
-                            <p class="text-parchment/80">${item.description}</p>
+             const content = document.createElement('div');
+             
+             if (message) {
+                const messageEl = document.createElement('p');
+                messageEl.className = 'text-center text-yellow-400 text-sm p-4';
+                messageEl.textContent = message;
+                page.appendChild(messageEl);
+             }
+             
+             if (!items || items.length === 0) {
+                content.className = 'p-6 text-center';
+                content.innerHTML = `<div class="loader"></div><p>Loading latest information...</p>`;
+             } else {
+                 content.className = 'p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto';
+                 items.forEach(item => {
+                    let buttonHtml = '';
+                    if (item.link) {
+                        buttonHtml = `<div class="mt-4">
+                                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">More Info</a>
+                                      </div>`;
+                    }
+
+                    content.innerHTML += `
+                        <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-5 flex flex-col">
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-bold text-sandstone-gold">${item.name}</h3>
+                                <p class="text-sm text-sandstone-gold/70 mb-2">${item.category}</p>
+                                <p class="text-parchment/80">${item.description}</p>
+                            </div>
+                            ${buttonHtml}
                         </div>
-                        ${buttonHtml}
-                    </div>
-                `;
-             });
+                    `;
+                 });
+             }
              page.appendChild(content);
         }
 
-        function createEventsPage(pageId, events) {
+        function createEventsPage(pageId, events, message) {
             const page = document.getElementById(pageId);
-            let content = `
-                <div class="p-6 page-content max-w-3xl mx-auto">
+            // Clear previous content except for the header
+            while(page.children.length > 1) {
+                page.removeChild(page.lastChild);
+            }
+            
+            const content = document.createElement('div');
+            
+            if (message) {
+                const messageEl = document.createElement('p');
+                messageEl.className = 'text-center text-yellow-400 text-sm p-4';
+                messageEl.textContent = message;
+                page.appendChild(messageEl);
+            }
+
+            if (!events || events.length === 0) {
+                 content.className = 'p-6 text-center';
+                content.innerHTML = `<div class="loader"></div><p>Loading latest events...</p>`;
+            } else {
+                content.className = 'p-6 page-content max-w-3xl mx-auto';
+                let eventsHtml = `
                     <p class="text-center text-xl mb-8 text-parchment/80">Experience world-class music, arts, and culture in our spectacular courtyard.</p>
                     <div class="space-y-8">
-            `;
-            events.forEach(event => {
-                content += `
-                    <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-6">
-                        <p class="text-sm font-semibold text-sandstone-gold">${event.date}</p>
-                        <h3 class="text-2xl mt-1 mb-2">${event.name}</h3>
-                        <p class="text-parchment/80 mb-4">${event.description}</p>
-                        <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">View Event</a>
-                    </div>
                 `;
-            });
-            content += `
-                    </div>
-                    <a href="https://www.thepiecehall.co.uk/events/" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">View Full Events Calendar</a>
-                </div>
-            `;
-            page.innerHTML += content;
+                events.forEach(event => {
+                    eventsHtml += `
+                        <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-6">
+                            <p class="text-sm font-semibold text-sandstone-gold">${event.date}</p>
+                            <h3 class="text-2xl mt-1 mb-2">${event.name}</h3>
+                            <p class="text-parchment/80 mb-4">${event.description}</p>
+                            <a href="${event.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">View Event</a>
+                        </div>
+                    `;
+                });
+                eventsHtml += `
+                        </div>
+                        <a href="https://www.thepiecehall.co.uk/events/" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">View Full Events Calendar</a>
+                `;
+                content.innerHTML = eventsHtml;
+            }
+            page.appendChild(content);
+        }
+        
+         function createNewsPage(pageId, newsItems, message) {
+            const page = document.getElementById(pageId);
+            while(page.children.length > 1) { page.removeChild(page.lastChild); }
+            const content = document.createElement('div');
+            if (message) {
+                const messageEl = document.createElement('p');
+                messageEl.className = 'text-center text-yellow-400 text-sm p-4';
+                messageEl.textContent = message;
+                page.appendChild(messageEl);
+            }
+            if (!newsItems || newsItems.length === 0) {
+                 content.className = 'p-6 text-center';
+                content.innerHTML = `<div class="loader"></div><p>Loading latest news...</p>`;
+            } else {
+                content.className = 'p-6 page-content max-w-3xl mx-auto';
+                let newsHtml = `<div class="space-y-8">`;
+                newsItems.forEach(item => {
+                    newsHtml += `
+                        <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-6">
+                            <h3 class="text-2xl mt-1 mb-2">${item.name}</h3>
+                            <p class="text-parchment/80 mb-4">${item.description}</p>
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-block bg-sandstone-gold text-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-yellow-500 transition-colors duration-200">Read More</a>
+                        </div>
+                    `;
+                });
+                newsHtml += `</div>
+                 <a href="https://www.thepiecehall.co.uk/news/" target="_blank" rel="noopener noreferrer" class="mt-8 block w-full max-w-xs mx-auto p-4 bg-sandstone-gold text-black font-bold text-lg text-center rounded-lg shadow-lg transform transition-all duration-200 hover:bg-yellow-500">View All News</a>
+                `;
+                content.innerHTML = newsHtml;
+            }
+            page.appendChild(content);
         }
 
-        createEventsPage('events-page', [
-             { name: 'Paint and Sip: Cocktail night', date: '26th September 2025', description: 'Unleash your creativity with a paintbrush in one hand and a cocktail in the other in this fun, relaxed workshop.', link: 'https://www.thepiecehall.co.uk/event/paint-and-sip-cocktail-night/'},
-             { name: 'Book Signing with Simon Armitage', date: '6th October 2025', description: 'Meet the Poet Laureate, Simon Armitage, and get your book signed in this special literary event.', link: 'https://www.thepiecehall.co.uk/event/book-signing-with-poet-laureate-simon-armitage/'},
-             { name: 'Real Markets at The Piece Hall', date: '12th October 2025', description: 'Explore a vibrant market featuring local produce, crafts, and delicious street food from the region\'s finest artisans.', link: 'https://www.thepiecehall.co.uk/event/real-markets-at-the-piece-hall-2/'},
-             { name: 'The Piece Hall Christmas Market', date: 'Weekends from 14th Nov - 21st Dec 2025', description: 'Get into the festive spirit with our magical Christmas market, featuring unique gifts, seasonal treats, and live music.', link: 'https://www.thepiecehall.co.uk/event/christmas-markets/'},
-             { name: 'Christmas Parties at The Piece Hall', date: '1st - 22nd December 2025', description: 'Celebrate the festive season in style with a special Christmas party in our unique and historic venue.', link: 'https://www.thepiecehall.co.uk/event/christmas-parties-at-the-piece-hall/'},
-             { name: 'ETHEL CAIN', date: '20th June 2026', description: 'A live music performance by the acclaimed artist Ethel Cain in the spectacular open-air courtyard.', link: 'https://www.thepiecehall.co.uk/event/ethel-cain/'},
-             { name: 'David Gray', date: '5th July 2026', description: 'Enjoy an unforgettable evening of music with celebrated singer-songwriter David Gray.', link: 'https://www.thepiecehall.co.uk/event/david-gray/'},
-             { name: 'The K’s', date: '8th August 2026', description: 'High-energy indie rock comes to the courtyard with a much-anticipated performance from The K\'s.', link: 'https://www.thepiecehall.co.uk/event/the-ks/'}
-        ]);
 
-        createDirectoryPage('shops-only-page', 'Shops', [
-            { name: 'The Society of Alchemists', category: 'Gifts', description: 'Unique and curious gifts with a touch of magic and mystery.', link: 'https://www.thepiecehall.co.uk/traders/the-society-of-alchemists/' },
-            { name: 'Little Acorn Gifts', category: 'Gifts', description: 'Charming gifts and keepsakes for all ages.', link: 'https://www.thepiecehall.co.uk/traders/little-acorn-gifts/' },
-            { name: 'Indian Summer', category: 'Fashion & Accessories', description: 'Bohemian-inspired fashion, accessories, and homeware.', link: 'https://www.thepiecehall.co.uk/traders/indian-summer/' },
-            { name: 'Hudson Belle', category: 'Gifts & Homeware', description: 'A curated collection of stylish gifts, homeware, and lifestyle products.', link: 'https://www.thepiecehall.co.uk/traders/hudson-belle/' },
-            { name: 'The Escaporium', category: 'Leisure', description: 'Thrilling escape room experiences for groups of all sizes.', link: 'https://www.thepiecehall.co.uk/traders/the-escaporium/' },
-            { name: 'The Yorkshire Soap Company', category: 'Gifts', description: 'Handmade soaps, bath treats, and beautifully scented gifts.', link: 'https://www.thepiecehall.co.uk/traders/the-yorkshire-soap-company/' },
-            { name: 'The Book Corner', category: 'Leisure & Books', description: 'A charming independent bookshop with a curated selection of reads.', link: 'https://www.thepiecehall.co.uk/traders/the-book-corner/' },
-            { name: 'Just Gaia', category: 'Food & Drink', description: 'An eco-friendly store offering zero-waste refills and sustainable products.', link: 'https://www.thepiecehall.co.uk/traders/just-gaia/' },
-            { name: 'Creative Crystals', category: 'Arts & Crafts', description: 'A dazzling array of crystals, gemstones, and holistic gifts.', link: 'https://www.thepiecehall.co.uk/traders/creative-crystals/' },
-            { name: 'The Yorkshire Gallery', category: 'Arts & Crafts', description: 'Showcasing paintings and sculptures from talented Yorkshire artists.', link: 'https://www.thepiecehall.co.uk/traders/the-yorkshire-gallery/' },
-            { name: 'Jitterbug Jean', category: 'Fashion & Accessories', description: 'Vintage and retro-inspired clothing and accessories.', link: 'https://www.thepiecehall.co.uk/traders/jitterbug-jean/' },
-            { name: 'The Handmade Gift Shop', category: 'Arts & Crafts', description: 'A wonderful collection of items from local makers and artists.', link: 'https://www.thepiecehall.co.uk/traders/the-handmade-gift-shop/' }
-        ]);
-        createDirectoryPage('eateries-only-page', 'Eateries', [
-            { name: 'The Hop Yard', category: 'Bar', description: 'A specialist craft beer bar offering a wide selection of local and international brews.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-hop-yard/' },
-            { name: 'La Piazza', category: 'Cafe', description: 'Authentic Italian coffee and pastries, bringing a taste of Italy to the courtyard.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/la-piazza/' },
-            { name: 'The Trading Rooms', category: 'Bar & Restaurant', description: 'Fine dining with a menu inspired by Yorkshire produce. Perfect for a special occasion.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-trading-rooms/' },
-            { name: 'The Deli', category: 'Cafe & Artisan Foods', description: 'Pick up delicious cheeses, cured meats, and local preserves to take home.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-deli/' },
-            { name: 'The Astronomer Diner', category: 'Cafe & Diner', description: 'A quirky, space-themed diner serving American classics and delicious milkshakes.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/astronomer-diner/' },
-            { name: 'The Wine Barrel', category: 'Wine Bar', description: 'An intimate bar offering a wide selection of fine wines and charcuterie boards.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-wine-barrel/' },
-            { name: 'The Bakery', category: 'Bar & Cafe', description: 'Freshly baked bread, cakes, and sandwiches, with a charming cafe space to enjoy them.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-bakery/' },
-            { name: 'Loafers', category: 'Bar & Cafe', description: 'A unique blend of a record store and a cafe, serving great coffee and vinyl culture.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/loafers/' }
-        ]);
+        function stripHtml(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            return doc.body.textContent || "";
+        }
+        
+       // --- LIVE DATA FETCHING (Web Scraping via Proxy with Fallback) ---
+        const PROXY_URL = 'https://api.allorigins.win/get?url=';
+        let allContent = [];
+        
+        // Static fallback data
+        const staticEvents = [ { name: 'Paint and Sip: Cocktail night', date: 'September 26 - September 26', description: 'See more details for Paint and Sip: Cocktail night.', link: 'https://www.thepiecehall.co.uk/event/paint-and-sip-cocktail-night/'}, { name: 'Book Signing with Poet Laureate Simon Armitage', date: 'October 6 - October 6', description: 'See more details for Book Signing with Poet Laureate Simon Armitage.', link: 'https://www.thepiecehall.co.uk/event/book-signing-with-poet-laureate-simon-armitage/'}, { name: 'Christmas Parties at The Piece Hall', date: 'December 1 - December 22', description: 'See more details for Christmas Parties at The Piece Hall.', link: 'https://www.thepiecehall.co.uk/event/christmas-parties-at-the-piece-hall/'} ];
+        const staticShops = [ { name: 'The Society of Alchemists', category: 'Gifts', description: 'Discover more about The Society of Alchemists.', link: 'https://www.thepiecehall.co.uk/traders/the-society-of-alchemists/' }, { name: 'Little Acorn Gifts', category: 'Gifts', description: 'Discover more about Little Acorn Gifts.', link: 'https://www.thepiecehall.co.uk/traders/little-acorn-gifts/' }, { name: 'The Jam Shack', category: 'Leisure', description: 'Discover more about The Jam Shack.', link: 'https://www.thepiecehall.co.uk/traders/the-jam-shack/' }];
+        const staticEateries = [ { name: 'The Hop Yard', category: 'Bar', description: 'Discover more about The Hop Yard.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-hop-yard/' }, { name: 'La Piazza', category: 'Cafe', description: 'Discover more about La Piazza.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/la-piazza/' }, { name: 'The Trading Rooms', category: 'Bar, Restaurant', description: 'Discover more about The Trading Rooms.', link: 'https://www.thepiecehall.co.uk/eat-and-drink/the-trading-rooms/' }];
+        const staticNews = [ { name: 'PIECE HALL ANNOUNCES BUMPER CHRISTMAS', description: 'The Piece Hall has announced a spectacular season of festive events for Christmas 2025 including the return of the ice rink, markets and live music.', link: 'https://www.thepiecehall.co.uk/news/'}, { name: 'ANNE LISTER’S BIRTHDAY WEEKEND', description: 'A weekend of celebrations are planned to mark the birthday of Halifax’s most famous daughter Anne Lister including talks, tours and music.', link: 'https://www.thepiecehall.co.uk/news/'}, ];
+        const staticOffers = [
+            { name: '20% Off at The Deli', description: 'Enjoy a 20% discount on all purchases over £10. Explore a wonderful selection of locally sourced food & drink, craft beers, and fine wines.', terms: 'Offer valid today only. Show this screen to redeem. Cannot be used in conjunction with any other offer.' },
+            { name: '20% Off at The Astronomer', description: 'Receive 20% off your total bill. A quirky, space-themed diner serving American classics and delicious milkshakes.', terms: 'Offer valid today only. Show this screen to redeem. Minimum spend £15.' }
+        ];
 
+        async function getLiveEvents() {
+            try {
+                const response = await fetch(`${PROXY_URL}${encodeURIComponent('https://www.thepiecehall.co.uk/culture/')}`);
+                if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
+                const proxyData = await response.json();
+                const htmlString = proxyData.contents;
+                
+                if (!htmlString) throw new Error("Could not fetch page content.");
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+
+                const events = Array.from(doc.querySelectorAll('.sub-block-link')).map(elem => {
+                    const name = elem.querySelector('h5')?.textContent.trim();
+                    const date = elem.querySelector('.cat-pill')?.textContent.trim();
+                    const link = elem.href;
+                    return { name, date, description: `See more details for ${name}.`, link, type: 'Event' };
+                }).filter(e => e.name && e.date);
+
+                if (events.length === 0) throw new Error("Could not parse any events.");
+                
+                allContent.push(...events);
+                createEventsPage('events-page', events);
+            } catch (error) {
+                console.error("Error scraping live events, using fallback data:", error);
+                allContent.push(...staticEvents.map(e => ({...e, type: 'Event'})));
+                createEventsPage('events-page', staticEvents, 'Showing cached information. Could not load live events.');
+            }
+        }
+        
+        async function getLiveDirectory(pageUrl, pageId, fallbackData, type) {
+             try {
+                const response = await fetch(`${PROXY_URL}${encodeURIComponent(pageUrl)}`);
+                if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
+                const proxyData = await response.json();
+                const htmlString = proxyData.contents;
+                
+                if (!htmlString) throw new Error("Could not fetch page content.");
+                
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+
+                const items = Array.from(doc.querySelectorAll('.image-content-block')).map(elem => {
+                    const linkEl = elem.querySelector('a');
+                    const name = linkEl.querySelector('h5')?.textContent.trim();
+                    const link = linkEl.href;
+                    const categories = Array.from(linkEl.querySelectorAll('.cat-pill')).map(pill => pill.textContent.trim()).join(', ');
+                    
+                    return { name, category: categories, description: `Discover more about ${name}.`, link, type: type };
+                }).filter(item => item.name);
+                
+                if (items.length === 0) throw new Error(`Could not parse any items from ${pageUrl}.`);
+                
+                allContent.push(...items);
+                createDirectoryPage(pageId, items);
+            } catch (error) {
+                console.error(`Error scraping directory for ${pageId}, using fallback data:`, error);
+                allContent.push(...fallbackData.map(item => ({...item, type: type})));
+                createDirectoryPage(pageId, fallbackData, `Showing cached information. Could not load live ${pageId.replace('-only-page', '')} data.`);
+            }
+        }
+        
+        async function getLiveNews() {
+            try {
+                const response = await fetch(`${PROXY_URL}${encodeURIComponent('https://www.thepiecehall.co.uk/news/')}`);
+                if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
+                const proxyData = await response.json();
+                const htmlString = proxyData.contents;
+                if (!htmlString) throw new Error("Could not fetch news content.");
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+
+                const newsItems = Array.from(doc.querySelectorAll('article.post')).map(article => {
+                    const titleEl = article.querySelector('h2 a');
+                    const descriptionEl = article.querySelector('.entry-summary p');
+                    return {
+                        name: titleEl ? titleEl.textContent.trim() : 'Untitled News',
+                        link: titleEl ? titleEl.href : '#',
+                        description: descriptionEl ? descriptionEl.textContent.trim() : 'No summary available.',
+                        type: 'News'
+                    };
+                });
+                
+                if (newsItems.length === 0) throw new Error("Could not parse news items.");
+
+                allContent.push(...newsItems);
+                createNewsPage('news-page', newsItems);
+            } catch(error) {
+                console.error("Error scraping live news, using fallback data:", error);
+                allContent.push(...staticNews.map(item => ({...item, type: 'News'})));
+                createNewsPage('news-page', staticNews, 'Showing cached information. Could not load live news.');
+            }
+        }
+        
+        // --- DATA INITIALIZATION ---
+        // This array will hold data from your simulated database (admin portal)
+        let dynamicContent = {
+            offers: [],
+            news: [],
+            products: []
+        };
+        
+        function initializeContent() {
+             // In a real app, this is where you'd fetch from Firestore
+             // For now, we'll just populate with static data as a fallback if scraping fails
+             createEventsPage('events-page', [], 'Attempting to load live events...');
+             createDirectoryPage('shops-only-page', [], 'Attempting to load live shop data...');
+             createDirectoryPage('eateries-only-page', [], 'Attempting to load live food & drink data...');
+             
+             // The news and offers will now come from the admin portal (simulated)
+             renderOffersFromDB();
+             renderNewsFromDB();
+
+            getLiveEvents();
+            getLiveDirectory('https://www.thepiecehall.co.uk/traders/', 'shops-only-page', staticShops, 'Shop');
+            getLiveDirectory('https://www.thepiecehall.co.uk/eat-and-drink/', 'eateries-only-page', staticEateries, 'Food & Drink');
+        }
 
         // --- GEMINI API ITINERARY PLANNER ---
         const itineraryForm = document.getElementById('itinerary-form');
         const resultContainer = document.getElementById('itinerary-result-container');
         const itineraryResultDiv = document.getElementById('itinerary-result');
-        const loader = resultContainer.querySelector('.loader');
+        const plannerLoader = resultContainer.querySelector('.loader');
 
         itineraryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             resultContainer.style.display = 'block';
-            loader.style.display = 'block';
+            plannerLoader.style.display = 'block';
             itineraryResultDiv.innerHTML = '';
 
             const duration = document.getElementById('visit-duration').value;
@@ -633,41 +1078,278 @@
                 console.error("Error fetching itinerary:", error);
                 itineraryResultDiv.innerHTML = `<p class="text-center text-red-400">An error occurred. Please check your connection and try again.</p>`;
             } finally {
-                loader.style.display = 'none';
+                plannerLoader.style.display = 'none';
             }
         });
         
         function simpleMarkdownToHtml(md) {
             return md
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h3>$1</h3>') // Also handle ##
-                .replace(/^# (.*$)/gim, '<h3>$1</h3>') // Also handle #
+                .replace(/^## (.*$)/gim, '<h3>$1</h3>') 
+                .replace(/^# (.*$)/gim, '<h3>$1</h3>') 
                 .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-                .replace(/\*(.*)\*/gim, '<li>$1</li>')
-                .replace(/^(?!<li|<\/ul>|<h3>|<strong>|<p>)(.*)$/gim, '<p>$1</p>')
-                .replace(/<\/li>\s*<p>/gim, '</li>') // Clean up paragraphs after list items
-                .replace(/<\/p>\s*<li>/gim, '<ul><li>') // Start list
-                .replace(/<\/li>\s*<p>/gim, '</li></ul><p>') // End list
-                .replace(/<li>/g, '<ul><li>') // Ensure lists are wrapped
-                .replace(/<\/li>/g, '</li></ul>')
-                .replace(/<\/ul>\s*<ul>/g, ''); // Fix nested list tags
+                .replace(/^- (.*$)/gim, '<li>$1</li>')
+                .replace(/\* (.*$)/gim, '<li>$1</li>')
+                .replace(/^(?!<li|<\/ul>|<h3>|<strong>|<p>|<ul>)(.*$)/gim, '<p>$1</p>')
+                .replace(/<\/li>\s*<p>/gim, '</li>') 
+                .replace(/<p>\s*<li>/gim, '<ul><li>') 
+                .replace(/<\/li>\s*<p>/gim, '</li></ul><p>')
+                .replace(/(<\/li>)(?!<ul>)/g, '$1</ul>')
+                .replace(/<\/ul>\s*<ul>/g, ''); 
         }
+
+        // --- PAYMENT REQUEST API (DONATION) ---
+        const paymentButton = document.getElementById('payment-button');
+        const paymentStatus = document.getElementById('payment-status');
+        const paymentSupportMessage = document.getElementById('payment-support-message');
+        const donationAmountBtns = document.querySelectorAll('.donation-amount-btn');
+        const customAmountInput = document.getElementById('custom-amount');
+
+        let selectedAmount = '10.00'; // Default amount
+
+        donationAmountBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                donationAmountBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedAmount = parseFloat(btn.dataset.amount).toFixed(2);
+                customAmountInput.value = '';
+            });
+        });
+
+        customAmountInput.addEventListener('input', () => {
+            if (customAmountInput.value) {
+                donationAmountBtns.forEach(b => b.classList.remove('selected'));
+                selectedAmount = parseFloat(customAmountInput.value).toFixed(2);
+            }
+        });
+
+        if (!window.PaymentRequest) {
+            paymentButton.disabled = true;
+            paymentSupportMessage.classList.remove('hidden');
+        }
+
+        paymentButton.addEventListener('click', () => {
+            const supportedPaymentMethods = [
+                { supportedMethods: 'https://apple.com/apple-pay', data: { version: 3, merchantIdentifier: 'merchant.com.example', merchantCapabilities: ['supports3DS'], supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'], countryCode: 'GB' } },
+                { supportedMethods: 'https://google.com/pay', data: { environment: 'TEST', apiVersion: 2, apiVersionMinor: 0, merchantInfo: { merchantId: '12345678901234567890', merchantName: 'The Piece Hall' }, allowedPaymentMethods: [{ type: 'CARD', parameters: { allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"], allowedCardNetworks: ["MASTERCARD", "VISA"] }, tokenizationSpecification: { type: 'PAYMENT_GATEWAY', parameters: { 'gateway': 'example', 'gatewayMerchantId': 'exampleGatewayMerchantId' } } }] } }
+            ];
+
+            const paymentDetails = {
+                total: {
+                    label: 'Donation to The Piece Hall',
+                    amount: { currency: 'GBP', value: selectedAmount }
+                }
+            };
+
+            const request = new PaymentRequest(supportedPaymentMethods, paymentDetails);
+
+            request.canMakePayment().then(canPay => {
+                if (canPay) {
+                    request.show().then(paymentResponse => {
+                        // SIMULATION: In a real app, send paymentResponse.details to your server
+                        // Your server would then process the payment with Stripe, etc.
+                        console.log('Payment successful!', paymentResponse);
+                        paymentStatus.innerHTML = `<div class="p-4 bg-green-200 text-green-800 rounded-lg"><h4 class="font-bold">Thank You!</h4><p>Your donation of £${selectedAmount} has been processed successfully. We appreciate your support!</p></div>`;
+                        paymentResponse.complete('success');
+                    }).catch(err => {
+                        console.error('Payment failed or was cancelled.', err);
+                        paymentStatus.innerHTML = `<p class="text-red-400">Payment was cancelled or failed. Please try again.</p>`;
+                    });
+                } else {
+                    paymentStatus.innerHTML = `<p class="text-yellow-400">No active payment method found. Please set up Apple Pay or Google Pay on your device.</p>`;
+                }
+            });
+        });
         
         // --- MAP PAGE LOGIC ---
         const mapLabels = document.querySelectorAll('#interactive-map .map-label');
         mapLabels.forEach(label => {
             label.addEventListener('click', () => {
-                mapLabels.forEach(l => l.style.opacity = '0.7');
+                mapLabels.forEach(l => { 
+                    l.style.opacity = '0.7';
+                    l.querySelector('text').style.fontWeight = 'normal';
+                });
                 label.style.opacity = '1';
+                label.querySelector('text').style.fontWeight = 'bold';
             });
         });
 
+        // --- SEARCH LOGIC ---
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const searchResultsContainer = document.getElementById('search-results-container');
+
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+                showPage('search-page');
+                displaySearchResults(query);
+            }
+        });
+        
+        async function displaySearchResults(query) {
+            const lowerCaseQuery = query.toLowerCase();
+            let resultsHtml = `<h2 class="text-3xl font-bold text-sandstone-gold mb-6">Results for "${query}"</h2>`;
+            searchResultsContainer.innerHTML = resultsHtml;
+
+            // 1. Instant local search
+            const allSearchableContent = [...allContent, ...dynamicContent.products];
+            const localResults = allSearchableContent.filter(item => 
+                item.name.toLowerCase().includes(lowerCaseQuery) ||
+                item.description.toLowerCase().includes(lowerCaseQuery) ||
+                (item.category && item.category.toLowerCase().includes(lowerCaseQuery))
+            );
+            
+            if (localResults.length > 0) {
+                 resultsHtml += `<h3 class="text-2xl text-sandstone-gold/80 mt-6 mb-4 border-b border-sandstone-gold/50 pb-2">In This Guide</h3>`;
+                resultsHtml += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+                localResults.forEach(item => {
+                    resultsHtml += `
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-5 flex flex-col hover:bg-sandstone-gold/10 transition-colors">
+                            <h4 class="text-xl font-bold text-sandstone-gold">${item.name}</h4>
+                             <p class="text-sm text-sandstone-gold/70 mb-2">${item.type}</p>
+                            <p class="text-parchment/80">${item.description}</p>
+                             ${item.price ? `<p class="text-right font-bold mt-auto text-lg text-sandstone-gold">£${item.price}</p>` : ''}
+                        </a>
+                    `;
+                });
+                resultsHtml += '</div>';
+                searchResultsContainer.innerHTML = resultsHtml;
+            }
+
+            // 2. Live web search
+            const webSearchLoader = document.createElement('div');
+            webSearchLoader.innerHTML = `
+                <h3 class="text-2xl text-sandstone-gold/80 mt-8 mb-4 border-b border-sandstone-gold/50 pb-2">Searching thepiecehall.co.uk...</h3>
+                <div class="loader"></div>`;
+            searchResultsContainer.appendChild(webSearchLoader);
+            
+            const webResults = await liveSearchWebsite(query);
+            webSearchLoader.remove();
+
+            if (webResults.length > 0) {
+                resultsHtml += `<h3 class="text-2xl text-sandstone-gold/80 mt-6 mb-4 border-b border-sandstone-gold/50 pb-2">More from the Website</h3>`;
+                resultsHtml += '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+                webResults.forEach(item => {
+                    // Avoid duplicating results already found locally
+                    if (!localResults.some(local => local.link === item.link)) {
+                        resultsHtml += `
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="bg-gray-900/50 border border-sandstone-gold rounded-lg p-5 flex flex-col hover:bg-sandstone-gold/10 transition-colors">
+                                <h4 class="text-xl font-bold text-sandstone-gold">${item.name}</h4>
+                                <p class="text-parchment/80 mt-2">${item.description}</p>
+                            </a>
+                        `;
+                    }
+                });
+                resultsHtml += '</div>';
+            } else {
+                 resultsHtml += `<p class="text-center text-lg text-parchment/80 mt-8">No additional results found on thepiecehall.co.uk.</p>`;
+            }
+
+            if (localResults.length === 0 && webResults.length === 0) {
+                searchResultsContainer.innerHTML = `<p class="text-center text-lg text-parchment/80">No results found for "${query}"</p>`;
+            } else {
+                searchResultsContainer.innerHTML = resultsHtml;
+            }
+        }
+
+        async function liveSearchWebsite(query) {
+            try {
+                const response = await fetch(`${PROXY_URL}${encodeURIComponent(`https://www.thepiecehall.co.uk/?s=${query}`)}`);
+                 if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
+                const proxyData = await response.json();
+                const htmlString = proxyData.contents;
+
+                if (!htmlString) throw new Error("Could not fetch page content for live search.");
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlString, 'text/html');
+
+                const results = Array.from(doc.querySelectorAll('article.post')).map(article => {
+                    const titleEl = article.querySelector('h2 a');
+                    const descriptionEl = article.querySelector('.entry-summary p');
+                    return {
+                        name: titleEl ? titleEl.textContent.trim() : 'Untitled Result',
+                        link: titleEl ? titleEl.href : '#',
+                        description: descriptionEl ? descriptionEl.textContent.trim() : 'No summary available.',
+                        type: 'Website Result'
+                    };
+                });
+                return results;
+            } catch (error) {
+                console.error("Live search failed:", error);
+                return []; // Return empty array on failure
+            }
+        }
+        
+        // --- DATABASE LISTENERS (SIMULATED) ---
+        // In a real app with Firestore, you'd use onSnapshot() to listen for real-time updates.
+        // For this demo, we'll use a BroadcastChannel to communicate between tabs.
+        const dbChannel = new BroadcastChannel('piece_hall_db');
+        dbChannel.onmessage = (event) => {
+            if (event.data && event.data.type === 'datachanged') {
+                if(event.data.news) {
+                    dynamicContent.news = event.data.news;
+                    renderNewsFromDB();
+                }
+                if(event.data.offers) {
+                    dynamicContent.offers = event.data.offers;
+                    renderOffersFromDB();
+                }
+                 if(event.data.products) {
+                    dynamicContent.products = event.data.products;
+                    allContent = allContent.filter(item => item.type !== 'Product');
+                    allContent.push(...dynamicContent.products);
+                }
+            }
+        };
+
+        function renderNewsFromDB() {
+            const dataToRender = dynamicContent.news.length > 0 ? dynamicContent.news : staticNews;
+            createNewsPage('news-page', dataToRender);
+        }
+
+        function renderOffersFromDB() {
+            const container = document.getElementById('offers-content');
+            const dataToRender = dynamicContent.offers.length > 0 ? dynamicContent.offers : staticOffers;
+
+            container.innerHTML = `
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl text-sandstone-gold">Discounts & Offers</h1>
+                    <p class="text-xl text-parchment/80 mt-2">Show this screen at participating outlets to redeem exclusive offers.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    ${dataToRender.map(offer => `
+                        <div class="bg-gray-900/50 border border-sandstone-gold rounded-lg flex flex-col overflow-hidden">
+                            <img src="${offer.image || `https://placehold.co/600x400/333333/B3A369?text=${encodeURIComponent(offer.name)}`}" alt="${offer.name}" class="w-full h-48 object-cover">
+                            <div class="p-6 flex flex-col flex-grow">
+                                <h3 class="text-2xl mt-0">${offer.name}</h3>
+                                <p class="text-parchment/80 mb-4 flex-grow">${offer.description}</p>
+                                <p class="text-xs text-sandstone-gold/70 mt-4">Terms: ${offer.terms}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
 
         // --- INITIALIZATION ---
         updateDateTime();
         setDynamicBackground();
         setInterval(updateDateTime, 60000);
+        initializePushNotifications();
+        initializeContent();
     });
+
+    // --- GOOGLE TRANSLATE ---
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
 </script>
 </body>
 </html>
